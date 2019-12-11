@@ -5,31 +5,63 @@ Commands to implement:
 help
 
 generate [-m|-h]
+-m: only a string used to generate the module
+-h: show generate-specific help text and examples
 
 list [-m|-s|-t|-h]
+-m:
+-s:
+-t:
+-h:
 
 tree [-m|-s|-t|-h]
+-m:
+-s:
+-t:
+-h:
 
 build [-m|-s|-h]
+-m:
+-s:
+-h:
 
 report [-m|-s|-t|-h]
+-m:
+-s:
+-t:
+-h:
 
 test [-m|--r|-s|-h]
+-m:
+-s:
+--r:
+-h:
 
 stat [-m|--r|-h]
+-m:
+--r:
+-h:
 
 format [-m|--r|-h]
+-m:
+--r:
+-h:
 
 analyze [-m|--r|-h]
+-m:
+--r:
+-h:
 
 td [-m|-s|--r|-h]
-
+-m:
+-s:
+--r:
+-h:
 
 
 Help.py
 
-
-
+for cmod help
 
 Utils.py
 

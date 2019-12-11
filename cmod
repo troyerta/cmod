@@ -23,15 +23,13 @@ help_types = [ '-h', '--h', 'help', '-help', '--help' ]
 def find_cmod():
 
 	# If no arg was included
-	if len(sys.argv) == 1:
-		print( "user needs help!" )
-		sys.exit()
+	# if len(sys.argv) == 1:
+	# 	print( "user needs help!" )
+	# 	sys.exit()
 	# If help argument provided
-	if len(sys.argv) > 1:
-		for arg in sys.argv:
-			if arg in help_types:
-				print( "user needs help!" )
-				sys.exit()
+	if len(sys.argv) == 1 or sys.argv[1] in help_types:
+		print("User needs help")
+		sys.exit()
 	if not os.path.isfile("config.ini"):
 		print( "config.ini missing or corrupted!")
 		sys.exit()
