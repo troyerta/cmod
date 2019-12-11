@@ -1,0 +1,6 @@
+*.pyc
+**/exe
+**/__pycache__
+**/results
+**/venv
+.vscode/*
