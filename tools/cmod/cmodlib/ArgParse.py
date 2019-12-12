@@ -24,10 +24,13 @@ def handle_generate( args, global_cfg, mod_cfg ):
 	gen = Generate()
 
 def handle_list( args, global_cfg, mod_cfg ):
-	print("handling list")
+	from List import List
+	list_runner = List( args )
 
 def handle_tree( args, global_cfg, mod_cfg ):
+	from Tree import tree
 	print("handling tree")
+	tree( args )
 
 def handle_build( args, global_cfg, mod_cfg ):
 	print("handling build")
@@ -95,6 +98,6 @@ class ArgParser:
 		idx = get_normalized_command_index( self.args[0] )
 		self.args.remove( self.args[0] )
 		handlers[ idx ]( self.args, self.global_config, self.module_config )
-
+		sys.exit()
 
 

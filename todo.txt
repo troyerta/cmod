@@ -14,6 +14,25 @@ list [-m|-s|-t|-h]
 -t:
 -h:
 
+Classes to make:
+
+Do minimal things on this at a time to
+keep each command simple.
+
+Module
+  Name
+  Path
+  ModuleConfig
+  Sources
+  TestSources
+  TestResultTxt
+  TestResults
+  Tests
+  TestGroups
+
+ModuleConfig
+
+
 tree [-m|-s|-t|-h]
 -m:
 -s:
@@ -24,6 +43,7 @@ build [-m|-s|-h]
 -m:
 -s:
 -h:
+-v:
 
 report [-m|-s|-t|-h]
 -m:
@@ -36,6 +56,7 @@ test [-m|--r|-s|-h]
 -s:
 --r:
 -h:
+-v:
 
 stat [-m|--r|-h]
 -m:
@@ -57,6 +78,7 @@ td [-m|-s|--r|-h]
 -s:
 --r:
 -h:
+-v:
 
 
 Help.py
