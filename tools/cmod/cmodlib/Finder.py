@@ -4,12 +4,12 @@ import argparse
 
 from Utils import find_modules
 
-class List:
+class Finder:
 	def __init__( self, args ):
 		self.modules = None
-		self.list_modules( args )
+		self.get_modules( args )
 
-	def list_modules( self, argv ):
+	def get_modules( self, argv ):
 		descriptionText = 'Prints a list of modules found under a passed-in directory'
 		usageText = 'cmod list [--m|--r]'
 
@@ -32,13 +32,27 @@ class List:
 		if self.root_dir is None:
 			self.root_dir = '.'
 			self.recurse = True
-
 		# This function can also be used to make Module objects when we need to do some testing
 		modules = find_modules( self.root_dir, self.recurse )
 
 		if modules:
-			self.modules = modules
-			for module in modules:
-				print( os.path.basename( os.path.dirname( os.path.normpath( module ) ) ) )
+			self.modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
 		else:
 			print("No modules found")
+
+	def print_module_names( self ):
+		if self.modules:
+			for module in self.modules:
+				print( os.path.basename( module ) )
+
+	def print_module_paths( self ):
+		if self.modules:
+			for module in self.modules:
+				print( module )
+
+	def get_module_paths( self ):
+		if self.modules:
+			return self.modules
+		else:
+			print("No modules found")
+			return None

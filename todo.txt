@@ -9,10 +9,10 @@ generate [-m|-h]
 -h: show generate-specific help text and examples
 
 list [-m|-s|-t|-h]
--m:
+-m: Done
 -s:
 -t:
--h:
+-h: Part
 
 Classes to make:
 
@@ -34,10 +34,10 @@ ModuleConfig
 
 
 tree [-m|-s|-t|-h]
--m:
--s:
--t:
--h:
+-m: Done
+-s: Part
+-t: Part
+-h: Part
 
 build [-m|-s|-h]
 -m:

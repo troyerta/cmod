@@ -24,16 +24,24 @@ def handle_generate( args, global_cfg, mod_cfg ):
 	gen = Generate()
 
 def handle_list( args, global_cfg, mod_cfg ):
-	from List import List
-	list_runner = List( args )
+	from Finder import Finder
+	finder = Finder( args )
+	finder.print_module_names()
 
 def handle_tree( args, global_cfg, mod_cfg ):
 	from Tree import tree
-	print("handling tree")
 	tree( args )
 
 def handle_build( args, global_cfg, mod_cfg ):
 	print("handling build")
+	from Finder import Finder
+	from Module import Module
+	# from Build import Build
+	finder = Finder( args )
+	modules = finder.get_module_paths()
+	if modules:
+		mods = [Module( module ) for module in modules]
+		[print(str(mod)) for mod in mods]
 
 def handle_report( args, global_cfg, mod_cfg ):
 	print("handling report")

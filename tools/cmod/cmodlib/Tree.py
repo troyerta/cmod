@@ -59,23 +59,57 @@ def print_tree( dir, padding, print_files=False, isLast=False, isFirst=False):
 			else:
 				print( padding + '├── ' + file )
 
-def tree( args ):
-	# No arguments passed in, show module tree for entire project
-	if len(args) == 0:
+def tree( argv ):
+	# Do arg parse stuff on the passed-in args
+	descriptionText = 'Prints a list of modules found under a passed-in directory'
+	usageText = 'cmod tree [--m|--s|--t|--h|--r]'
+
+	parser = ArgumentParser( description=descriptionText, usage=usageText )
+
+	parser.add_argument( '--module', '-module', '--m', '-m', \
+	type=str, \
+	dest='module', \
+	help='--module example:' )
+
+	parser.add_argument( '--suites', '-suites', '--s', '-s', \
+	dest='suite', \
+	help='--suite example:', \
+	action='store_true' )
+
+	parser.add_argument( '--tests', '-tests', '--t', '-t', \
+	dest='test', \
+	help='--test example:', \
+	action='store_true' )
+
+	if argv is not None:
+		args = parser.parse_args( argv )
+
+	# No module passed in, show module tree for entire project
+	if args.module is None:
 		path = '.'
 		print_tree( path, '', False, False, True )
+	else:
+		path = args.module
 	# Use base module argument to print it's child modules
-	# elif len(args) == 2:
-	# 	# print( "print just directories" )
-	# 	path = args[1]
-	# 	if isdir(path):
-	# 		print_tree( path, '', False, False, True )
-	# 	else:
-	# 		print( 'ERROR: \'' + path + '\' is not a directory' )
+		if args.suite is None:
+			if isdir(path):
+				print_tree( path, '', False, False, True )
+			else:
+				print( 'ERROR: \'' + path + '\' is not a directory' )
+		else:
+			# Grab all the test suites of all the modules we find
+			# Print them
+			if args.test is None:
+				print("Print module and suites")
+			else:
+				print("Print modules, suites, and tests")
+				# Print the tests under each test suite
+
 	# Special case that can print files in some module as well
 	# We need to be able to make a test suite, and test case tree as well
 	# Will find dirs under the target dir, and for each module, make some Module
 	# object that's capable of finding all the test groups and their tests.
+
 	# elif len(args) == 3 and args[1] == '-f':
 	# 	# print( "print directories and files" )
 	# 	path = args[2]
@@ -83,5 +117,6 @@ def tree( args ):
 	# 		print_tree(path, '', True, False, True)
 	# 	else:
 	# 		print( 'ERROR: \'' + path + '\' is not a directory' )
-	else:
-		print( usage() )
+
+	# else:
+	# 	print( usage() )
