@@ -74,6 +74,7 @@ class Module:
             f.close()
 
     def run_makefile( self ):
+        # print("Testing", self.name)
         p1 = subprocess.Popen( ['make', '--directory', self.path ], stdout=subprocess.PIPE )
         p1.wait()
 
@@ -81,7 +82,7 @@ class Module:
         print("reading test output")
 
     def print_test_results( self ):
-        print("printing test result")
+        print("printing test result\n")
 
     def run_tests( self ):
         self.run_makefile()

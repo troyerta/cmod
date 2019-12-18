@@ -42,22 +42,22 @@ def handle_build( args, global_cfg, mod_cfg ):
 # 		[print(str(mod)) for mod in mods]
 
 def handle_report( args, global_cfg, mod_cfg ):
-    print("handling report")
+    print("handling report\n")
 
 def handle_test( args, global_cfg, mod_cfg ):
-    print("handling test")
+    print("handling test\n")
 
 def handle_stat( args, global_cfg, mod_cfg ):
-    print("handling stat")
+    print("handling stat\n")
 
 def handle_format( args, global_cfg, mod_cfg ):
-    print("handling format")
+    print("handling format\n")
 
 def handle_analyze( args, global_cfg, mod_cfg ):
-    print("handling analyze")
+    print("handling analyze\n")
 
 def handle_tdd( args, global_cfg, mod_cfg ):
-    print("handling tdd")
+    print("handling TDD\n")
     from TestDrive import TestDrive
     test_driver = TestDrive( args, global_cfg, mod_cfg )
     test_driver.run_cycle()

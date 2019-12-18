@@ -15,8 +15,8 @@ class TestDrive:
         wksp = Workspace( self.args, mod_cfg=self.mod_cfg )
         wksp.find_wksp_test_src_files()
         wksp.find_wksp_tests_and_groups()
-        wksp.gen_test_runners()
-        wksp.run_tests()
+        wksp.gen_wksp_test_runners()
+        wksp.run_wksp_tests()
 
         # Back to 1 process
-        # wksp.print_test_summary()
+        wksp.print_test_summary()
