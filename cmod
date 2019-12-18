@@ -22,36 +22,36 @@ help_types = [ '-h', '--h', 'help', '-help', '--help' ]
 
 def find_cmod():
 
-	# If no arg was included
-	# if len(sys.argv) == 1:
-	# 	print( "user needs help!" )
-	# 	sys.exit()
-	# If help argument provided
-	if len(sys.argv) == 1 or sys.argv[1] in help_types:
-		print("User needs help")
-		sys.exit()
-	if not os.path.isfile("config.ini"):
-		print( "config.ini missing or corrupted!")
-		sys.exit()
+    # If no arg was included
+    # if len(sys.argv) == 1:
+    # 	print( "user needs help!" )
+    # 	sys.exit()
+    # If help argument provided
+    if len(sys.argv) == 1 or sys.argv[1] in help_types:
+        print("User needs help")
+        sys.exit()
+    if not os.path.isfile("config.ini"):
+        print( "config.ini missing or corrupted!")
+        sys.exit()
 
-	# Make sure the venv executable is running
-	if not sys.executable.endswith( cmod_executable ):
-		print("Not running the venv python")
-		print( "Expected", cmod_executable )
-		print("Found", sys.executable, "instead")
-		sys.exit()
-	return True
-	# Grab the config object and pass it and the args to the correct function
+    # Make sure the venv executable is running
+    if not sys.executable.endswith( cmod_executable ):
+        print("Not running the venv python")
+        print( "Expected", cmod_executable )
+        print("Found", sys.executable, "instead")
+        sys.exit()
+    return True
+    # Grab the config object and pass it and the args to the correct function
 
 if find_cmod():
-	sys.path.insert(0, 'tools/cmod/cmodlib')
+    sys.path.insert(0, 'tools/cmod/cmodlib')
 
 if __name__ == "__main__":
-	from Config import Config
-	from ArgParse import ArgParser
+    from Config import Config
+    from ArgParse import ArgParser
 
-	config = Config()
-	global_configs = config.get_section_items('GLOBAL')
-	module_configs = config.get_section_items('DEFAULT_MODULE_STRUCTURE')
-	cmod_arg_parser = ArgParser( sys.argv[1:], global_configs, module_configs )
-	cmod_arg_parser.cmod_entry()
+    config = Config()
+    global_configs = config.get_section_items('GLOBAL')
+    module_configs = config.get_section_items('DEFAULT_MODULE_STRUCTURE')
+    cmod_arg_parser = ArgParser( sys.argv[1:], global_configs, module_configs )
+    cmod_arg_parser.cmod_entry()

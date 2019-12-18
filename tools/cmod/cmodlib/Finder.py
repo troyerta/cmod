@@ -4,6 +4,8 @@ import argparse
 
 from Utils import find_modules
 
+# Difference between this and the Workspace class?
+
 class Finder:
 	def __init__( self, args ):
 		self.modules = None

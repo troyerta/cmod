@@ -87,23 +87,23 @@ def tree( argv ):
 	# No module passed in, show module tree for entire project
 	if args.module is None:
 		path = '.'
-		print_tree( path, '', False, False, True )
+		# print_tree( path, '', False, False, True )
 	else:
 		path = args.module
 	# Use base module argument to print it's child modules
-		if args.suite is None:
-			if isdir(path):
-				print_tree( path, '', False, False, True )
-			else:
-				print( 'ERROR: \'' + path + '\' is not a directory' )
+	if args.suite is False:
+		if isdir(path):
+			print_tree( path, '', False, False, True )
 		else:
-			# Grab all the test suites of all the modules we find
-			# Print them
-			if args.test is None:
-				print("Print module and suites")
-			else:
-				print("Print modules, suites, and tests")
-				# Print the tests under each test suite
+			print( 'ERROR: \'' + path + '\' is not a directory' )
+	else:
+		# Grab all the test suites of all the modules we find
+		# Print them
+		if args.test is False:
+			print("Print module and suites")
+		else:
+			print("Print modules, suites, and tests")
+			# Print the tests under each test suite
 
 	# Special case that can print files in some module as well
 	# We need to be able to make a test suite, and test case tree as well
