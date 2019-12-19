@@ -25,7 +25,7 @@ def handle_generate( args, global_cfg, mod_cfg ):
 
 def handle_list( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
-    wksp = Workspace( args )
+    wksp = Workspace( args=args, mod_cfg=mod_cfg )
     wksp.print_module_names()
 
 def handle_tree( args, global_cfg, mod_cfg ):
@@ -57,7 +57,6 @@ def handle_analyze( args, global_cfg, mod_cfg ):
     print("handling analyze\n")
 
 def handle_tdd( args, global_cfg, mod_cfg ):
-    print("handling TDD\n")
     from TestDrive import TestDrive
     test_driver = TestDrive( args, global_cfg, mod_cfg )
     test_driver.run_cycle()

@@ -17,6 +17,7 @@ class TestDrive:
         wksp.find_wksp_tests_and_groups()
         wksp.gen_wksp_test_runners()
         wksp.run_wksp_tests()
+        wksp.calculate_test_result_totals()
 
         # Back to 1 process
         wksp.print_test_summary()

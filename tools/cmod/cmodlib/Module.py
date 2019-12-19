@@ -6,7 +6,7 @@ import subprocess
 from Unity import TestSrc, TestResult, UnityOutput, TestSummary
 
 class Module:
-    def __init__( self, path, configs ):
+    def __init__( self, path, configs, verbosity=None ):
         self.path = os.path.normpath( path )
         self.name = os.path.basename( self.path )
         self.config = configs
@@ -16,7 +16,12 @@ class Module:
         self.test_runner_path = None
         self.test_output_filepath = os.path.join( self.path, self.config["results_dir"], self.config["results_txt_prefix"] + self.name.lower() + self.config["results_txt_suffix"] + ".txt" )
 
-        self.verbosity = int(self.config["default_verbosity"])
+        # Override the config setting if a Workspace wants to
+        if verbosity is None:
+            self.verbosity = int(self.config["default_verbosity"])
+        else:
+            self.verbosity = verbosity
+
         self.test_result_summary = None
         self.test_output_list = list()
         self.test_result_list = list()
@@ -121,6 +126,18 @@ class Module:
 
     def calculate_test_results( self ):
         pass
+
+    def get_test_num_passed( self ):
+        return self.test_result_summary.passed
+
+    def get_test_num_failed( self ):
+        return self.test_result_summary.failed
+
+    def get_test_num_ignored( self ):
+        return self.test_result_summary.ignored
+
+    def get_test_num_total( self ):
+        return self.test_result_summary.total
 
     def print_test_results( self, verbosity=None ):
         if verbosity is None:

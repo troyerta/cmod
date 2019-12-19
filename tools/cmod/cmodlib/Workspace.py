@@ -11,22 +11,23 @@ from Module import Module
 
 # Difference between this and the Finder class?
 def make_progress_str( total, progress ):
-	total_str = str(total)
-	progress_str = str(progress)
-	total_str_width = len(total_str)
-	progress_str_width = len(progress_str)
+    total_str = str(total)
+    progress_str = str(progress)
+    total_str_width = len(total_str)
+    progress_str_width = len(progress_str)
 
-	output = '['
-	for x in range((total_str_width - progress_str_width)):
-		output += ' '
-	output += progress_str + "/" + total_str + "]"
-	return output
+    output = '['
+    for x in range((total_str_width - progress_str_width)):
+        output += ' '
+    output += progress_str + "/" + total_str + "]"
+    return output
 
 class Workspace:
     def __init__(self, args=None, global_cfg=None, mod_cfg=None):
         self.root_dir = None
         self.global_cfg = global_cfg
         self.mod_cfg = mod_cfg
+        self.verbosity = int(self.mod_cfg["default_verbosity"])
         self.module_path_list = self.get_workspace_module_paths( args )
         self.module_objs = self.get_module_objects()
 
@@ -36,7 +37,12 @@ class Workspace:
         self.num_ignored = 0
         self.num_failed = 0
         self.recurse = None
-        self.verbosity = 0
+
+        self.passed = 0
+        self.failed = 0
+        self.ignored = 0
+        self.total = 0
+
 
     def find_module_dir( self, module ):
         matches = list()
@@ -91,7 +97,8 @@ class Workspace:
             self.root_dir = '.'
             self.recurse = True
         # This function can also be used to make Module objects when we need to do some testing
-        print("Finding modules..", end='')
+        if self.verbosity > 1:
+            print("Finding modules..", end='')
         modules = self.find_modules( self.root_dir, self.recurse )
         modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
         return modules
@@ -114,8 +121,9 @@ class Workspace:
             return None
 
     def get_module_objects( self ):
-        module_objs = [Module( module, self.mod_cfg ) for module in self.module_path_list]
-        print("[" + str(len(module_objs)) + "]")
+        module_objs = [Module( module, self.mod_cfg, self.verbosity ) for module in self.module_path_list]
+        if self.verbosity > 1:
+            print("[" + str(len(module_objs)) + "]")
         return module_objs
 
     def find_wksp_test_src_files( self ):
@@ -128,12 +136,25 @@ class Workspace:
         [mod.gen_test_runner() for mod in self.module_objs]
 
     def run_module_test( self, module, progress ):
-        print(make_progress_str(self.num_modules, progress ) + " Testing " + module.path)
+        if self.verbosity > 1:
+            print(make_progress_str(self.num_modules, progress ) + " Testing " + module.path)
         sys.stdout.flush()
         module.run_tests()
 
     def run_wksp_tests( self ):
         [self.run_module_test( mod, count) for count,mod in enumerate( self.module_objs, 1)]
 
+    def accum_module_totals( self, module ):
+        self.passed = self.passed + module.get_test_num_passed()
+        self.failed += module.get_test_num_failed()
+        self.ignored += module.get_test_num_ignored()
+        self.total += module.get_test_num_total()
+
+    def calculate_test_result_totals( self ):
+        [self.accum_module_totals( mod ) for mod in self.module_objs]
+
     def print_test_summary( self ):
-        print("Work on workspace test summaries!")
+        if self.verbosity >= 1:
+            print( "-------------------------------------------------------------" )
+            print( "\033[92m PASS:", self.passed, "\033[91m FAIL:", self.failed, "\033[93m IGNORE:", self.ignored, "\033[94m TOTAL:", self.total, "tests", "\033[00m", "in", str(self.num_modules), "modules" )
+            print( "-------------------------------------------------------------" )
