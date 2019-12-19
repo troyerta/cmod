@@ -68,3 +68,91 @@ class TestSrc():
             # print("\n")
         self.TestGroups = test_group_obj_list
         return test_group_obj_list
+
+class TestResult():
+    def __init__( self, source_file=None, line=None, test_group=None, test_case=None, result=None, message=None ):
+        self.source_file = source_file
+        self.line = line
+        self.test_group = test_group
+        self.test_case = test_case
+        self.result = result
+        self.message = message
+
+    def __str__(self):
+        return self.format_test_output_terminal()
+
+    def format_test_output_terminal( self ):
+        if self.result == "FAIL":
+            output = "   \033[91m " + self.result + ":\033[00m   " + os.path.basename(self.source_file) + ":" + self.line + " - " + self.test_case
+        elif self.result == "IGNORE":
+            output = "   \033[93m " + self.result + ":\033[00m " + os.path.basename(self.source_file) + ":" + self.line + " - " + self.test_case
+        elif self.result == "PASS":
+            output = "   \033[92m " + self.result + ":\033[00m   " + self.test_case
+        if self.message:
+            output += ": " + self.message
+        # print(output)
+        return output
+
+    def format_results_file( self ):
+        output = "    " + self.result + ": " + os.path.basename(self.source_file) + ":" + self.line + " - " + self.test_case
+        if self.message:
+            output += ": " + self.message
+        return output
+
+class TestSummary():
+    def __init__(self, total=0, passed=0, failed=0, ignored=0):
+        self.total = total
+        self.passed = passed
+        self.failed = failed
+        self.ignored = ignored
+
+class UnityOutput():
+    def __init__(self, path):
+        self.test_output_filepath = os.path.normpath( path )
+        self.result_list = None
+        self.summary = None
+
+    def read_test_output( self ):
+        # print("Reading", self.test_output_filepath)
+        lineList = list()
+        with open(self.test_output_filepath, 'r') as fi:
+            for line in fi:
+                lineList.append(line.rstrip('\n'))
+            result_list = list()
+            # This just prints the entire file
+            for line in lineList:
+                # print(line)
+                # This regex matches most everything at the front-end, but combines the FAIL:result and the possible message
+                # To be searched for later. Its ok to not have a message!
+                results_match = re.search( r'\.*([a-zA-Z].*):([\d]+).*:TEST\s*\(\s*(.*),\W*(.*)\s*\)\s*:\s*(.*)\s*:?', line )
+
+                # Get the Unity test summary
+                test_summary = re.search( r'(\d+) Tests (\d+) Failures (.+) Ignored', line )
+
+                if results_match:
+                    status_match = re.search( r'^([A-Z]*):?', results_match.group(5) )
+                    message_match = re.search( r'^.*:\s*(.+)$', results_match.group(5) )
+
+                    # Not every test case has a message
+                    if message_match:
+                        message = message_match.group(1)
+                    else:
+                        message = ''
+
+                    result_list.append( TestResult( results_match.group(1), \
+                                                    results_match.group(2), \
+                                                    results_match.group(3), \
+                                                    results_match.group(4), \
+                                                    status_match.group(1), \
+                                                    message \
+                                                    ) \
+                                        )
+                if test_summary:
+                    summary = [ test_summary.group(1), test_summary.group(2), test_summary.group(3) ]
+                    totals = TestSummary( total = int(summary[0]), \
+                        passed = int(summary[0]) - ( int(summary[1]) + int(summary[2]) ), \
+                            failed = int(summary[1]), \
+                                ignored = int(summary[2]) )
+            # [print( result ) for result in result_list]
+            fi.close()
+        return result_list, totals

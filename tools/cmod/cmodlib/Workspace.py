@@ -136,4 +136,4 @@ class Workspace:
         [self.run_module_test( mod, count) for count,mod in enumerate( self.module_objs, 1)]
 
     def print_test_summary( self ):
-        print("wksp tested!")
+        print("Work on workspace test summaries!")
