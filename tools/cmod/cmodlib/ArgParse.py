@@ -8,7 +8,6 @@ list_types = [ 'list', 'l' ]
 tree_types = [ 'tree', 'tr' ]
 build_types = [ 'build', 'bld' ]
 report_types = [ 'report', 'rpt' ]
-test_types = [ 'test', 'tst' ]
 stat_types = [ 'stat', 'st' ]
 format_types = [ 'format', 'fmt' ]
 analyze_types = [ 'analyze', 'an' ]
@@ -32,15 +31,6 @@ def handle_tree( args, global_cfg, mod_cfg ):
     from Tree import tree
     tree( args )
 
-def handle_build( args, global_cfg, mod_cfg ):
-    print("handling build")
-# 	from Finder import Finder
-# 	finder = Finder( args )
-# 	modules = finder.get_module_paths()
-# 	if modules:
-# 		mods = [Module( module ) for module in modules]
-# 		[print(str(mod)) for mod in mods]
-
 def handle_report( args, global_cfg, mod_cfg ):
     print("handling report\n")
 
@@ -57,40 +47,41 @@ def handle_analyze( args, global_cfg, mod_cfg ):
     print("handling analyze\n")
 
 def handle_tdd( args, global_cfg, mod_cfg ):
-    from TestDrive import TestDrive
-    test_driver = TestDrive( args, global_cfg, mod_cfg )
-    test_driver.run_cycle()
+    from Workspace import Workspace
+    wksp = Workspace( args, mod_cfg=mod_cfg )
+    wksp.find_wksp_test_src_files()
+    wksp.find_wksp_tests_and_groups()
+    wksp.gen_wksp_test_runners()
+    wksp.run_wksp_tests()
+    wksp.calculate_test_result_totals()
+    wksp.print_test_summary()
 
-action_types = [ 'help', 'generate', 'list', 'tree', 'build', 'report', 'test', 'stat', 'format', 'analyze', 'td' ]
-handlers = [ handle_help, handle_generate, handle_list, handle_tree, handle_build, handle_report, handle_test, handle_stat, handle_format, handle_analyze, handle_tdd ]
-# cmod_task_dict = dict(zip(action_types, action_handlers))
+action_types = [ 'help', 'generate', 'list', 'tree', 'report', 'stat', 'format', 'analyze', 'tdd' ]
+action_handlers = [ handle_help, handle_generate, handle_list, handle_tree,  handle_report, handle_stat, handle_format, handle_analyze, handle_tdd ]
+cmod_cmd_dict = dict(zip(action_types, action_handlers))
 
 def get_normalized_command_index( input_cmd ):
     if input_cmd in help_types:
         from Help import Help
-        return 0
+        return action_types[0]
     elif input_cmd in generate_types:
-        return 1
+        return action_types[1]
     elif input_cmd in list_types:
-        return 2
+        return action_types[2]
     elif input_cmd in tree_types:
-        return 3
-    elif input_cmd in build_types:
-        return 4
+        return action_types[3]
     elif input_cmd in report_types:
-        return 5
-    elif input_cmd in test_types:
-        return 6
+        return action_types[4]
     elif input_cmd in stat_types:
-        return 7
+        return action_types[5]
     elif input_cmd in format_types:
-        return 8
+        return action_types[6]
     elif input_cmd in analyze_types:
-        return 9
+        return action_types[7]
     elif input_cmd in tdd_types:
-        return 10
+        return action_types[8]
     else:
-        print("invalid cmod command")
+        print("invalid cmod command:", "\""+input_cmd+"\"" )
         sys.exit()
 
 class ArgParser:
@@ -100,12 +91,7 @@ class ArgParser:
         self.module_config = module_configs
 
     def cmod_entry(self):
-        # if self.args[0] not in action_types:
-            # print("invalid cmod command")
-            # sys.exit()
-        idx = get_normalized_command_index( self.args[0] )
+        cmd = get_normalized_command_index( self.args[0] )
         self.args.remove( self.args[0] )
-        handlers[ idx ]( self.args, self.global_config, self.module_config )
+        cmod_cmd_dict[cmd]( self.args, self.global_config, self.module_config )
         sys.exit()
-
-

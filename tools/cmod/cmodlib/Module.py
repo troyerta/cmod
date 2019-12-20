@@ -145,8 +145,8 @@ class Module:
 
         if verbosity <= 2:
             return
-
         if( verbosity >= 7 ):
+            print("")
             for source in self.test_sources:
                 print(source.path+":")
                 for group in source.TestGroups:
@@ -165,6 +165,7 @@ class Module:
                 print("")
             return
         elif( verbosity == 6 ):
+            print("")
             for source in self.test_sources:
                 for group in source.TestGroups:
                     print("  "+group.name+":")
@@ -182,6 +183,7 @@ class Module:
                 print("")
             return
         elif( verbosity == 5 ):
+            print("")
             for result in self.test_result_list:
                 print( result )
             print("")

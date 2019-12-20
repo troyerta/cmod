@@ -9,7 +9,6 @@ from Module import Module
 # the Module class does, but with lists of
 # Modules instead
 
-# Difference between this and the Finder class?
 def make_progress_str( total, progress ):
     total_str = str(total)
     progress_str = str(progress)

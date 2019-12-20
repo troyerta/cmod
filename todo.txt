@@ -73,12 +73,14 @@ analyze [-m|--r|-h]
 --r:
 -h:
 
-td [-m|-s|--r|-h]
+tdd [-m|-s|--r|-h]
 -m:
 -s:
 --r:
 -h:
 -v:
+
+clean
 
 
 Help.py
