@@ -1,9 +1,11 @@
 import os
 import sys
 import argparse
+import re
 
 help_types = [ 'help', 'h', '-h', '--h', '--help' ]
 generate_types = [ 'generate', 'gen' ]
+clean_types = [ 'clean' ]
 list_types = [ 'list', 'l' ]
 tree_types = [ 'tree', 'tr' ]
 build_types = [ 'build', 'bld' ]
@@ -11,7 +13,7 @@ report_types = [ 'report', 'rpt' ]
 stat_types = [ 'stat', 'st' ]
 format_types = [ 'format', 'fmt' ]
 analyze_types = [ 'analyze', 'an' ]
-tdd_types = [ 'td', 'tdd' ]
+tdd_types = [ 'td', 'tdd', 'test', 'tst' ]
 
 def handle_help( args, global_cfg, mod_cfg ):
     print("handling help")
@@ -34,9 +36,6 @@ def handle_tree( args, global_cfg, mod_cfg ):
 def handle_report( args, global_cfg, mod_cfg ):
     print("handling report\n")
 
-def handle_test( args, global_cfg, mod_cfg ):
-    print("handling test\n")
-
 def handle_stat( args, global_cfg, mod_cfg ):
     print("handling stat\n")
 
@@ -56,8 +55,30 @@ def handle_tdd( args, global_cfg, mod_cfg ):
     wksp.calculate_test_result_totals()
     wksp.print_test_summary()
 
-action_types = [ 'help', 'generate', 'list', 'tree', 'report', 'stat', 'format', 'analyze', 'tdd' ]
-action_handlers = [ handle_help, handle_generate, handle_list, handle_tree,  handle_report, handle_stat, handle_format, handle_analyze, handle_tdd ]
+def get_module_arg( args_in ):
+    matches = list()
+    [matches.append( arg ) for arg in filter(lambda x: re.match(r'--?m(odule)?=.*$', x), args_in)]
+    [matches.append( arg ) for arg in filter(lambda x: re.match(r'--?r$', x), args_in)]
+    # [print(match) for match in matches if matches is not None]
+    return matches
+
+def handle_clean( args, global_cfg, mod_cfg ):
+    print("doing a clean..")
+    from Workspace import Workspace
+    from Clean import Cleaner
+    fake_args = list()
+    [fake_args.append( arg) for arg in get_module_arg( args )]
+    fake_args.append('--v=0')
+    wksp = Workspace( fake_args, mod_cfg=mod_cfg )
+    [args.remove( mod_arg ) for mod_arg in get_module_arg( args )]
+    print(args)
+    cleaner = Cleaner( args, wksp.get_module_objects(), mod_cfg )
+    cleaner.read_args()
+    cleaner.find_files()
+    cleaner.do_cleaning()
+
+action_types = [ 'help', 'generate', 'list', 'tree', 'report', 'stat', 'format', 'analyze', 'tdd', 'clean' ]
+action_handlers = [ handle_help, handle_generate, handle_list, handle_tree,  handle_report, handle_stat, handle_format, handle_analyze, handle_tdd, handle_clean ]
 cmod_cmd_dict = dict(zip(action_types, action_handlers))
 
 def get_normalized_command_index( input_cmd ):
@@ -80,6 +101,8 @@ def get_normalized_command_index( input_cmd ):
         return action_types[7]
     elif input_cmd in tdd_types:
         return action_types[8]
+    elif input_cmd in clean_types:
+        return action_types[9]
     else:
         print("invalid cmod command:", "\""+input_cmd+"\"" )
         sys.exit()

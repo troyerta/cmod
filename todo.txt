@@ -19,6 +19,8 @@ Classes to make:
 Do minimal things on this at a time to
 keep each command simple.
 
+Make module marker configurable
+
 Module
   Name
   Path
@@ -81,11 +83,17 @@ tdd [-m|-s|--r|-h]
 -v:
 
 clean
-
+--m: apply "clean" to single module or multiple
+--dry
+--runners
+--results
+--builds
+--all (default)
+--venv
+--verbose
 
 Help.py
 
 for cmod help
 
-Utils.py
 

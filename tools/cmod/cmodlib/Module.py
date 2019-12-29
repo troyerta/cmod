@@ -58,8 +58,8 @@ class Module:
         basename = os.path.splitext( os.path.basename( self.path ))
         test_runner_basename = self.config["runner_src_prefix"] + basename[0].lower() + self.config["runner_src_suffix"] +'.c'
         self.test_runner_path = os.path.join( self.path, self.config["runner_dir"], test_runner_basename )
-        os.makedirs( self.config["runner_dir"], exist_ok=True )
-        # print( 'test_runner_basename =', test_runner_basename)
+        os.makedirs( os.path.join( self.path, self.config["runner_dir"]), exist_ok=True )
+        # print( 'test_runner_path =', self.test_runner_path)
 
         with open(self.test_runner_path, "w+") as f:
             f.write('#include \"unity_fixture.h\"\n')

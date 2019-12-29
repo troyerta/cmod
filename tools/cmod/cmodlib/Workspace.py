@@ -42,19 +42,20 @@ class Workspace:
         self.ignored = 0
         self.total = 0
 
-
     def find_module_dir( self, module ):
         matches = list()
-        script = os.path.join( os.path.normpath(module), 'test' )
-        if os.path.isfile(script):
-            matches.append( script )
+        # script = os.path.join( os.path.normpath(module), 'test' )
+        # if os.path.isfile(script):
+        test_dir = os.path.join( os.path.normpath(module), 'unit_testing' )
+        if os.path.isdir(test_dir):
+            matches.append( test_dir )
         return matches
 
     def find_module_dirs_recursive( self, module ):
-        pattern = "^test$"
+        pattern = "^unit_testing$"
         matches = list()
         for root, dirs, files in os.walk( module ):
-            [matches.append( os.path.join(root, file) ) for file in filter(lambda x: re.match(pattern, x), files)]
+            [matches.append( os.path.join(root, dir) ) for dir in filter(lambda x: re.match(pattern, x), dirs)]
         return matches
 
     def find_modules( self, root_dir, recurse ):
@@ -67,7 +68,7 @@ class Workspace:
 
     def get_workspace_module_paths( self, argv ):
         descriptionText = 'Prints a list of modules found under a passed-in directory'
-        usageText = 'cmod list [--m|--r]'
+        usageText = 'cmod workspace [--m|--r]'
 
         parser = argparse.ArgumentParser( description=descriptionText, usage=usageText )
 
@@ -86,6 +87,7 @@ class Workspace:
         dest='verbosity', \
         help='--verbosity example:' )
 
+        print( argv )
         args = parser.parse_args( argv )
         self.root_dir = args.module
         self.recurse = args.recurse
@@ -155,5 +157,9 @@ class Workspace:
     def print_test_summary( self ):
         if self.verbosity >= 1:
             print( "-------------------------------------------------------------" )
-            print( "\033[92m PASS:", self.passed, "\033[91m FAIL:", self.failed, "\033[93m IGNORE:", self.ignored, "\033[94m TOTAL:", self.total, "tests", "\033[00m", "in", str(self.num_modules), "modules" )
+            print( "\033[92m PASS: " + str(self.passed) + \
+                "\033[91m FAIL: " + str(self.failed) + \
+                "\033[93m IGNORE: " + str(self.ignored) + \
+                "\033[94m TOTAL: " + str(self.total) + \
+                "\033[00m tests in " + str(self.num_modules) + " modules" )
             print( "-------------------------------------------------------------" )

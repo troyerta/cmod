@@ -104,7 +104,7 @@ $(EXECUTABLE): $(SRC_FILES) $(INC_FILES)
 $(EXE_DIR):
 	@$(MKDIR) $@
 
-$(RUNNERS_DIR):
+$(RUNNER_DIR):
 	@$(MKDIR) $@
 
 $(RESULTS_DIR):
