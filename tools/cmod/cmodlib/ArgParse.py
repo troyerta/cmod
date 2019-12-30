@@ -63,16 +63,8 @@ def get_module_arg( args_in ):
     return matches
 
 def handle_clean( args, global_cfg, mod_cfg ):
-    print("doing a clean..")
-    from Workspace import Workspace
     from Clean import Cleaner
-    fake_args = list()
-    [fake_args.append( arg) for arg in get_module_arg( args )]
-    fake_args.append('--v=0')
-    wksp = Workspace( fake_args, mod_cfg=mod_cfg )
-    [args.remove( mod_arg ) for mod_arg in get_module_arg( args )]
-    print(args)
-    cleaner = Cleaner( args, wksp.get_module_objects(), mod_cfg )
+    cleaner = Cleaner( args, mod_cfg )
     cleaner.read_args()
     cleaner.find_files()
     cleaner.do_cleaning()
