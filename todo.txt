@@ -1,5 +1,21 @@
 
 
+Make a register_generator.py file
+
+Add a command that makes a new
+cmodlib/generators/*_generator.py
+from a template, filling in the name
+of the generate target.
+
+Tell cmod that the generator is valid and should be used by
+"registering" it in config.ini
+
+each *_generator.py uses a template to print the contents
+of each generated file, and a set of pre-defined callbacks
+used to generate the file name
+
+Same thing can be done for snippet generation.
+
 Commands to implement:
 
 help
@@ -47,33 +63,7 @@ build [-m|-s|-h]
 -h:
 -v:
 
-report [-m|-s|-t|-h]
--m:
--s:
--t:
--h:
 
-test [-m|--r|-s|-h]
--m:
--s:
---r:
--h:
--v:
-
-stat [-m|--r|-h]
--m:
---r:
--h:
-
-format [-m|--r|-h]
--m:
---r:
--h:
-
-analyze [-m|--r|-h]
--m:
---r:
--h:
 
 tdd [-m|-s|--r|-h]
 -m:
@@ -96,4 +86,213 @@ Help.py
 
 for cmod help
 
+
+
+
+
+
+
+[TDD]
+Test Harnesses: Catch, minunit, Greatest, CppUTest API, CMocka,
+Mocking Frameworks: FFF, CMock?
+[STATIC]
+Static Analyzers:
+Complexity:
+Formatters: Snippet of code #1! Snippet of code #1!
+https://sourceforge.net/projects/gcgreatcode/
+artistic style
+uncrustify
+https://www.gnu.org/software/indent/
+https://invisible-island.net/bcpp/
+
+TODO Before starting MCU project:
+
+Tests:
+[==========] - Make filename prefixes and suffixes configurable
+[==========] - Use default verbosity in config.ini
+[==========] - Define the other verbosity output levels and implement them - only 1 and 2 exist so far
+[==========] - More processing should be done after read_results() to fill in data for the passing test cases
+[==========] - Make test verbosity level configurable
+[==========] - Enable test output to show test source names and test groups
+[==========] - Read the results files and present test summary after a run of tests
+[==========] - Print test summary after testing multiple modules
+[==========] - Module test scripts should take an argument that enables results to be printed or redirected to some file
+            [    ] - Step 1:
+[          ] - Add fff to test generator - add it conditionally during test source generation?
+[==========] - Add another verbosity level to handle printed test summary
+[========  ] - Remove test suite source file, just build suites into Runner source
+            [====] - config.ini: Rm line 23-25, line 51
+            [====] - gen_module_makefile.py lines 37,45,46
+            [====] - TestModule.py: line 19,20,21 modify gen_test_suites() in TestModule class
+            [====] - module_makefile: Rm all refs to SUITE_DIR and SUITE_SRC
+            [====] -  Rm suite stuff from each module's makefile
+            [    ] - Add option to "./cmod test -m=module_name"  : -s=SUITE_NAME
+                    To build/run only the specified suite to the runner
+            - should this be a cmod list feature?
+
+List all modules under the specified parent module
+cmod list --m=module
+
+List all modules with their test suites/groups under the specified parent module
+cmod list --m=module --suites
+
+Now, we should be able to run this
+cmod test --m=module --suites=?
+
+which is the same as
+cmod list --m=module --suites
+
+Which will list the suites in that module
+
+Now we can go and run just that specified suite:
+cmod test --module=HWM --suite=TEST_HWM_SUITE
+
+Or possibly even
+cmod test --module=HWM --suite=TEST_HWM_SUITE --test=TestNumbersDontExplode
+
+
+
+
+
+
+
+Makefile:
+[==========] - Review what module makefile cleans during a cleaning
+[==========] - Comment the module Makefile
+[==========] - Remove sort call on SRC files in makefile
+[          ] - Add an include dir option to the config, and add to Makefile include flags
+[          ] - Enable CFLAG overrides in the module-makefile
+
+Setup and Install:
+[          ] - Make a bash script that runs the python venv setup and installation
+https://stackoverflow.com/questions/53151899/python-how-to-script-virtual-environment-building-and-activation
+https://stackoverflow.com/questions/57921255/how-to-create-python-virtual-environment-within-a-python-script
+[          ] - Fix the project-level scripts to check for the proper venv before running, or maybe just a init/config script
+
+Configuration:
+[=====     ] - Reinvent the module settings definition to include more things
+[==========] - Add SW versioning to Config class
+[========= ] - Add all config.ini paths to module makefile - make them easy to adjust during module gen time
+[          ] - Make dependency flow chart for Configs, to find best place to read them in and best place to distribute them
+[          ] - Config should just become a single dictionary that gets read once, then passed around all over the place?
+- Ways to change things: Pass the dict itself around instead of a tag name
+  - This is the case during module testing - but needs to change for module/file generation
+- Demand that all modules have the same structure everywhere?
+- Or Store a module's structure in a config.ini local to the module
+- Store settings in an ini IFF the module needs to differ in structure from the default
+
+[==========] - Add config explanations to config file as comment via ";" or "#"
+[==========] - Add filename prefix and suffix to config and to makefile
+
+Generation:
+[          ] - FileGenerator.build() needs a new solution - refactor entire thing
+[          ] - Add "This is a generated file" warning to the files that should not be hand-modified
+            [    ] - /* Do not modify - this is a generated file. Please refer to *** to modify the way this file is made
+[          ] - Draft up a copy of the licensing text to be used
+            [    ] -
+[          ] - Make generator addition/deletion configurable
+[          ] - Make a .mk file generator (for module exporting, and simplified testing outside of project)
+[===       ] - Finish "cmod list" functionality
+[===       ] - Finish cmod tree functionality
+[          ] - Place file generation scripts in same .py module to simplify the way styles can be defined
+
+General:
+[          ] - Finish "help" messages in scripts
+[          ] - Set a git commit template using "git config commit.template relative-path-from-repository-root"
+[          ] - Work on packaging - more like waf
+[          ] - Move file gen functions to somewhere more useful - reduce python source file count
+[          ] - Move utest folder to cmod dir as a "plugin" or "aux" directory
+[          ] - Write manual and examples and demos - "Release" version v0.01 on github
+[          ] - Add license to top of every source file
+[          ] - Make a module packager that can export a module with a Makefile that builds and runs tests
+[          ] - Better-integrate tree and list functions to Cmod conventions and argument styling
+
+cmod:
+test
+list
+
+both use a lot of similar module searching techniques
+
+"list" could do all the same things that "test" does, prior to running tests
+"test" could do all the "list" things, finding modules and filling in all their class instances
+"report" could do all the "test" things done after all tests complete
+
+this implies we could do all the same things but down on a test suite, test case resolution
+presuming that "list" and "test" and "report" all use and fill in the same types of class instances.
+
+So maybe I need a more generic "get_modules" function that returns a list of
+module objects to a workspace class.
+
+
+
+
+
+
+
+
+
+
+
+
+
+TODO as MCU project progresses:
+
+Refactor:
+[=======   ] - Make stuff OO whenever possible or necessary
+[          ] - Switch os.path to pathlib - still necessary to do?
+
+Features:
+[          ] - Add compiledb option to project: https://pypi.org/project/compiledb/ ( useful for static analysis )
+[          ] - Add support for a static analysis class
+[          ] - Add lizard code analyzer
+[          ] - Code analysis reports on LOC count, complexity, static analysis
+[          ] - Make basic formatter class that calls uncrustify or something
+[          ] - Make host toolchain configurable
+[          ] - Make cross compile toolchain configurable
+[          ] - Make both host compiler and cross compiler usable from specified system path instead of relying on $PATH
+
+TODO Pre Public Release:
+
+[          ] - Make snippet templates, one for each coding style
+[          ] - Add pycparser
+[          ] - Get AST data from a source file
+[          ] - Re-generate/print a new source file from the old one
+[          ] - Define a standard format
+[          ] - Add a basic formatter class
+[          ] - Configurable test result output formatting - xml, JUnit, XUnit, HTML summaries, text
+[          ] - Add test results layer to convert between result formats
+[          ] - Support more test harnesses - configurable with config.ini
+[          ] - Add test harness abstraction layer
+
+TODO Post Public Release:
+
+[          ] - Run and print coverity and gcov reports
+[          ] - Make a mocks wrapper - attach to config class
+[          ] - Add an exception framework
+[          ] - For snippet generator, consider just running a regex through a target file, replacing the commands with the desired xform?
+[          ] - Make snippet templates, one for each coding style
+[          ] - Add code format to project config.ini - inform all snippet and file generators, and format tools of this setting
+[          ] - Possible to convert from one style to another?
+[=====     ] - Start adding other python modules
+[          ] - look into adding pre-post-commit git hooks for doing some more stuff automatically
+[          ] - Simplify the generated test source
+[          ] - Add platform/terminal-agnostic color output to test results
+[          ] - Reorganize CMOD to look more like waf's project layout
+[          ] - Add filename, function name styles and standards are selectable functions(cbs) that generate the desired style
+[          ] - Move/organize file printing functions to something "Style-specific"
+[          ] - Print modules as a dir tree
+[          ] - Snippet generator should check for xclip or xsel before running, otherwise try installing it
+"sudo apt-get install xclip" or "sudo apt-get install xsel" (only necessary for Linux systems)
+
+[          ] - Add script that can do venv stuff: Use config class to add/remove python packages to venv
+- Makes sure that python3 is installed - callable from environment
+- Makes sure that pip or pip3 is installed - callable from environment
+- Checks for venv
+- Removes venv
+- Sets up venv
+- Adds package to venv, updates requirements.txt
+python3.8 -m venv tools/venv
+source tools/venv/bin/activate
+pip3.8 install -r requirements.txt
+deactivate - TODO: make the tools/ dir configurable when setup.py runs
 

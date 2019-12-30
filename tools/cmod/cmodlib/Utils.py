@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import datetime
 
 def find_module_dir( module ):
     matches = list()
@@ -25,3 +26,15 @@ def find_modules( root_dir, recurse ):
     else:
         matches = find_module_dir( root_dir )
     return matches
+
+def get_date_str():
+    date_time = datetime.datetime.now()
+    date_time_str = date_time.strftime("%Y-%m-%d %H:%M")
+    date_str = date_time_str.split(' ',1)
+    return date_str[0]
+
+def splitpath(path, maxdepth=20):
+     ( head, tail ) = os.path.split(path)
+     return splitpath(head, maxdepth - 1) + [ tail ] \
+         if maxdepth and head and head != path \
+         else [ head or tail ]

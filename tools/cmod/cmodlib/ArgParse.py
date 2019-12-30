@@ -3,6 +3,10 @@ import sys
 import argparse
 import re
 
+sys.path.insert(1, 'tools/cmod/cmodlib/generators')
+
+from source_generator import print_src
+
 help_types = [ 'help', 'h', '-h', '--h', '--help' ]
 generate_types = [ 'generate', 'gen' ]
 clean_types = [ 'clean' ]
@@ -21,8 +25,11 @@ def handle_help( args, global_cfg, mod_cfg ):
 def handle_generate( args, global_cfg, mod_cfg ):
     from Generate import Generate
     print("handling generate")
+
+    print( args )
+    print_src( args[0], mod_cfg, global_cfg )
     # Sets up an argparser and runs
-    gen = Generate()
+    # gen = Generate()
 
 def handle_list( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
@@ -54,13 +61,6 @@ def handle_tdd( args, global_cfg, mod_cfg ):
     wksp.run_wksp_tests()
     wksp.calculate_test_result_totals()
     wksp.print_test_summary()
-
-def get_module_arg( args_in ):
-    matches = list()
-    [matches.append( arg ) for arg in filter(lambda x: re.match(r'--?m(odule)?=.*$', x), args_in)]
-    [matches.append( arg ) for arg in filter(lambda x: re.match(r'--?r$', x), args_in)]
-    # [print(match) for match in matches if matches is not None]
-    return matches
 
 def handle_clean( args, global_cfg, mod_cfg ):
     from Clean import Cleaner
