@@ -92,7 +92,7 @@ class Cleaner:
             self.root_dir = '.'
             self.recurse = True
 
-        if modules := find_modules( self.root_dir, self.recurse ):
+        if modules := find_modules( self.root_dir, self.recurse, self.configs ):
             self.modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
 
         if temp_args.dry is not None:

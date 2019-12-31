@@ -75,7 +75,7 @@ class Workspace:
             self.root_dir = '.'
             self.recurse = True
         # This function can also be used to make Module objects when we need to do some testing
-        modules = find_modules( self.root_dir, self.recurse )
+        modules = find_modules( self.root_dir, self.recurse, self.mod_cfg )
         modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
         if len(modules) > 1 and self.verbosity > 1:
             print("Finding modules..", end='')

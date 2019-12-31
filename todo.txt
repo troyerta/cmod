@@ -1,20 +1,6 @@
 
-
-Make a register_generator.py file
-
-Add a command that makes a new
-cmodlib/generators/*_generator.py
-from a template, filling in the name
-of the generate target.
-
 Tell cmod that the generator is valid and should be used by
 "registering" it in config.ini
-
-each *_generator.py uses a template to print the contents
-of each generated file, and a set of pre-defined callbacks
-used to generate the file name
-
-Same thing can be done for snippet generation.
 
 Commands to implement:
 
@@ -35,8 +21,6 @@ Classes to make:
 Do minimal things on this at a time to
 keep each command simple.
 
-Make module marker configurable
-
 Module
   Name
   Path
@@ -47,9 +31,6 @@ Module
   TestResults
   Tests
   TestGroups
-
-ModuleConfig
-
 
 tree [-m|-s|-t|-h]
 -m: Done
