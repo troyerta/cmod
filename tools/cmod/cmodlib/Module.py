@@ -10,8 +10,8 @@ class Module:
         self.path = os.path.normpath( path )
         self.name = os.path.basename( self.path )
         self.config = configs
-        self.test_sources = list()	# List of test source objects
-        self.test_src_paths = list()	# list of paths
+        self.test_sources = list()    # List of test source objects
+        self.test_src_paths = list()  # list of paths
         self.test_groups = list()
         self.test_runner_path = None
         self.test_output_filepath = os.path.join( self.path, self.config["results_dir"], self.config["results_txt_prefix"] + self.name.lower() + self.config["results_txt_suffix"] + ".txt" )
@@ -148,7 +148,7 @@ class Module:
         if( verbosity >= 7 ):
             print("")
             for source in self.test_sources:
-                print(source.path+":")
+                print(os.path.basename(source.path)+":")
                 for group in source.TestGroups:
                     print("  "+group.name+":")
                     for test in group.testList:

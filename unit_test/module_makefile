@@ -73,7 +73,7 @@ SRC_FILES = $(CUT_SRC) $(UNITY_SRC) $(TEST_SRC) $(RUNNER_SRC)
 # All places to look for headers
 INC_DIRS=-I. -I$(UNITY_DIR) -I$(FFF_DIR)
 
-# List of all headers so we can track their existance as dependencies
+# List of all headers so we can track their existence as dependencies
 INC_FILES=\
   $(wildcard $(UNITY_DIR)/%.h) \
   $(wildcard $(FFF_DIR)/%.h) \

@@ -5,8 +5,6 @@ import re
 
 sys.path.insert(1, 'tools/cmod/cmodlib/generators')
 
-from source_generator import print_src
-
 help_types = [ 'help', 'h', '-h', '--h', '--help' ]
 generate_types = [ 'generate', 'gen' ]
 clean_types = [ 'clean' ]
@@ -24,10 +22,22 @@ def handle_help( args, global_cfg, mod_cfg ):
 
 def handle_generate( args, global_cfg, mod_cfg ):
     from Generate import Generate
+    from source_generator import print_source
+    from header_generator import print_header
+    from test_source_generator import print_test_source
+    # from test_runner_generator import print_test_runner
+    from tdd_script_generator import print_tdd_script
+    from makefile_generator import print_makefile
     print("handling generate")
 
-    print( args )
-    print_src( args[0], mod_cfg, global_cfg )
+    module_dir = args[0].lstrip("/")
+
+    # print( args )
+    print_source( module_dir, mod_cfg, global_cfg )
+    print_header( module_dir, mod_cfg, global_cfg )
+    print_test_source( module_dir, mod_cfg, global_cfg )
+    print_makefile( module_dir, mod_cfg, global_cfg )
+    print_tdd_script( module_dir, mod_cfg, global_cfg )
     # Sets up an argparser and runs
     # gen = Generate()
 
