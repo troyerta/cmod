@@ -59,7 +59,7 @@ def print_test_source( module_path, module_configs, global_configs ):
     date = get_date_str()
     file_path = gen_path_test_src( module_path, module_configs )
     header_include = gen_path_hdr( module_path, module_configs )
-    print( file_path )
+    # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     project_name = global_configs["project"]

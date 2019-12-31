@@ -5,31 +5,30 @@ import re
 
 sys.path.insert(1, 'tools/cmod/cmodlib/generators')
 
-help_types = [ 'help', 'h', '-h', '--h', '--help' ]
+help_types     = [ 'help', 'h', '-h', '--h', '--help' ]
 generate_types = [ 'generate', 'gen' ]
-clean_types = [ 'clean' ]
-list_types = [ 'list', 'l' ]
-tree_types = [ 'tree', 'tr' ]
-build_types = [ 'build', 'bld' ]
-report_types = [ 'report', 'rpt' ]
-stat_types = [ 'stat', 'st' ]
-format_types = [ 'format', 'fmt' ]
-analyze_types = [ 'analyze', 'an' ]
-tdd_types = [ 'td', 'tdd', 'test', 'tst' ]
+clean_types    = [ 'clean' ]
+list_types     = [ 'list', 'l' ]
+tree_types     = [ 'tree', 'tr' ]
+build_types    = [ 'build', 'bld' ]
+report_types   = [ 'report', 'rpt' ]
+stat_types     = [ 'stat', 'st' ]
+format_types   = [ 'format', 'fmt' ]
+analyze_types  = [ 'analyze', 'an' ]
+tdd_types      = [ 'td', 'tdd', 'test', 'tst' ]
 
 def handle_help( args, global_cfg, mod_cfg ):
     print("handling help")
 
+# Generate a module, file, or snippet
 def handle_generate( args, global_cfg, mod_cfg ):
     from Generate import Generate
     from source_generator import print_source
     from header_generator import print_header
     from test_source_generator import print_test_source
-    # from test_runner_generator import print_test_runner
     from tdd_script_generator import print_tdd_script
     from makefile_generator import print_makefile
-    print("handling generate")
-
+    # Make sure raw path arg string has no leading slash
     module_dir = args[0].lstrip("/")
 
     # print( args )
@@ -38,8 +37,6 @@ def handle_generate( args, global_cfg, mod_cfg ):
     print_test_source( module_dir, mod_cfg, global_cfg )
     print_makefile( module_dir, mod_cfg, global_cfg )
     print_tdd_script( module_dir, mod_cfg, global_cfg )
-    # Sets up an argparser and runs
-    # gen = Generate()
 
 def handle_list( args, global_cfg, mod_cfg ):
     from Workspace import Workspace

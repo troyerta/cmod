@@ -32,7 +32,7 @@ def print_included_headers( file, includes ):
 def print_header( module_path, module_configs, global_configs ):
     date = get_date_str()
     file_path = gen_path_hdr( module_path, module_configs )
-    print( file_path )
+    # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     project_name = global_configs["project"]
@@ -40,7 +40,6 @@ def print_header( module_path, module_configs, global_configs ):
     license = global_configs["license"]
     repo = global_configs["repo"]
     include_guard = '_' + os.path.splitext(basename)[0].upper() + '_' + 'H' + '_'
-
 
     with open(file_path, "w+") as f:
         f.write('/**********************************************************\n')
@@ -54,8 +53,6 @@ def print_header( module_path, module_configs, global_configs ):
         f.write('\n')
         f.write('#ifndef ' + include_guard + '\n')
         f.write('#define ' + include_guard + '\n')
-        # print_section_header(f,'Includes')
-        # print_included_headers(f, includes)
         f.write('\n')
         print_section_header(f,'Types')
         f.write('\n')

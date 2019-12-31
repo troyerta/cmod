@@ -75,10 +75,10 @@ class Workspace:
             self.root_dir = '.'
             self.recurse = True
         # This function can also be used to make Module objects when we need to do some testing
-        if self.verbosity > 1:
-            print("Finding modules..", end='')
         modules = find_modules( self.root_dir, self.recurse )
         modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
+        if len(modules) > 1 and self.verbosity > 1:
+            print("Finding modules..", end='')
         return modules
 
     def print_module_names( self ):
@@ -100,7 +100,7 @@ class Workspace:
 
     def get_module_objects( self ):
         module_objs = [Module( module, self.mod_cfg, self.verbosity ) for module in self.module_path_list]
-        if self.verbosity > 1:
+        if len(module_objs) > 1 and self.verbosity > 1:
             print("[" + str(len(module_objs)) + "]")
         return module_objs
 
@@ -114,8 +114,10 @@ class Workspace:
         [mod.gen_test_runner() for mod in self.module_objs]
 
     def run_module_test( self, module, progress ):
-        if self.verbosity > 1:
+        if self.num_modules > 1 and self.verbosity > 1:
             print(make_progress_str(self.num_modules, progress ) + " Testing " + module.path)
+        elif self.verbosity > 1:
+            print(" Testing " + module.path)
         sys.stdout.flush()
         module.run_tests()
 

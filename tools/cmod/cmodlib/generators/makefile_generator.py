@@ -7,15 +7,11 @@ from Utils import splitpath
 
 # def print_makefile( file_path, depth, module_config_tag ):
 def print_makefile( module_path, module_configs, global_configs ):
-    # print("Module Makefile Gen")
-    # print("\tfile_path =", file_path)
-    # print("\tdepth =", depth)
     file_path = os.path.join( module_path, "Makefile" )
-    print( file_path )
+    # print( file_path )
 
-    # TODO: Try me!
     depth = len( splitpath( file_path )) - 1
-    print( depth )
+    # print( depth )
 
     project_root_dir = '../'
     for each in range(depth-1):
