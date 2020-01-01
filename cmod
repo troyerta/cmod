@@ -31,7 +31,7 @@ if find_cmod():
 
 if __name__ == "__main__":
     from Config import Config
-    from ArgParse2 import ArgParser
+    from ArgParse import ArgParser
 
     config = Config()
     cmod_arg_parser = ArgParser( sys.argv[1:], \
