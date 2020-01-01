@@ -115,44 +115,50 @@ class UnityOutput():
     def read_test_output( self ):
         # print("Reading", self.test_output_filepath)
         lineList = list()
-        with open(self.test_output_filepath, 'r') as fi:
-            for line in fi:
-                lineList.append(line.rstrip('\n'))
-            result_list = list()
-            # This just prints the entire file
-            for line in lineList:
-                # print(line)
-                # This regex matches most everything at the front-end, but combines the FAIL:result and the possible message
-                # To be searched for later. Its ok to not have a message!
-                results_match = re.search( r'\.*([a-zA-Z].*):([\d]+).*:TEST\s*\(\s*(.*),\W*(.*)\s*\)\s*:\s*(.*)\s*:?', line )
+        result_list = list()
 
-                # Get the Unity test summary
-                test_summary = re.search( r'(\d+) Tests (\d+) Failures (.+) Ignored', line )
+        if os.path.isfile( self.test_output_filepath ):
+            with open(self.test_output_filepath, 'r') as fi:
+                for line in fi:
+                    lineList.append(line.rstrip('\n'))
+                # This just prints the entire file
+                for line in lineList:
+                    # print(line)
+                    # This regex matches most everything at the front-end, but combines the FAIL:result and the possible message
+                    # To be searched for later. Its ok to not have a message!
+                    results_match = re.search( r'\.*([a-zA-Z].*):([\d]+).*:TEST\s*\(\s*(.*),\W*(.*)\s*\)\s*:\s*(.*)\s*:?', line )
 
-                if results_match:
-                    status_match = re.search( r'^([A-Z]*):?', results_match.group(5) )
-                    message_match = re.search( r'^.*:\s*(.+)$', results_match.group(5) )
+                    # Get the Unity test summary
+                    test_summary = re.search( r'(\d+) Tests (\d+) Failures (.+) Ignored', line )
 
-                    # Not every test case has a message
-                    if message_match:
-                        message = message_match.group(1)
-                    else:
-                        message = ''
+                    if results_match:
+                        status_match = re.search( r'^([A-Z]*):?', results_match.group(5) )
+                        message_match = re.search( r'^.*:\s*(.+)$', results_match.group(5) )
 
-                    result_list.append( TestResult( results_match.group(1), \
-                                                    results_match.group(2), \
-                                                    results_match.group(3), \
-                                                    results_match.group(4), \
-                                                    status_match.group(1), \
-                                                    message \
-                                                    ) \
-                                        )
-                if test_summary:
-                    summary = [ test_summary.group(1), test_summary.group(2), test_summary.group(3) ]
-                    totals = TestSummary( total = int(summary[0]), \
-                        passed = int(summary[0]) - ( int(summary[1]) + int(summary[2]) ), \
-                            failed = int(summary[1]), \
-                                ignored = int(summary[2]) )
-            # [print( result ) for result in result_list]
-            fi.close()
+                        # Not every test case has a message
+                        if message_match:
+                            message = message_match.group(1)
+                        else:
+                            message = ''
+
+                        result_list.append( TestResult( results_match.group(1), \
+                                                        results_match.group(2), \
+                                                        results_match.group(3), \
+                                                        results_match.group(4), \
+                                                        status_match.group(1), \
+                                                        message \
+                                                        ) \
+                                            )
+                    if test_summary:
+                        summary = [ test_summary.group(1), test_summary.group(2), test_summary.group(3) ]
+                        totals = TestSummary( total = int(summary[0]), \
+                            passed = int(summary[0]) - ( int(summary[1]) + int(summary[2]) ), \
+                                failed = int(summary[1]), \
+                                    ignored = int(summary[2]) )
+                # [print( result ) for result in result_list]
+                fi.close()
+        else:
+            result_list.append( TestResult() )
+            totals = TestSummary(0,0,0,0)
+
         return result_list, totals

@@ -30,62 +30,16 @@ class Cleaner:
         self.all_flag = False
         self.venv_flag = False
         self.verbose = False
+        self.scripts_flag = False
+
+        self.read_args()
 
     def read_args( self ):
-        descriptionText = 'Deletes selected module components and artifacts'
-        usageText = 'cmod clean [--m|--r]'
+        # descriptionText = 'Deletes selected module components and artifacts'
+        # print( self.args )
 
-        parser = argparse.ArgumentParser( description=descriptionText, usage=usageText )
-
-        parser.add_argument( '--dry', '-dry', \
-        dest='dry', \
-        help='--dry example:', \
-        action='store_true' )
-
-        parser.add_argument( '--runners', '-runners', \
-        dest='runners', \
-        help='--runners example:', \
-        action='store_true' )
-
-        parser.add_argument( '--builds', '-builds', \
-        dest='builds', \
-        help='--builds example:', \
-        action='store_true' )
-
-        parser.add_argument( '--results', '-results', \
-        dest='results', \
-        help='--results example:', \
-        action='store_true' )
-
-        parser.add_argument( '--all', '-all', \
-        dest='all', \
-        help='--all example:', \
-        action='store_true' )
-
-        parser.add_argument( '--venv', '-venv', \
-        dest='venv', \
-        help='--venv example:', \
-        action='store_true' )
-
-        parser.add_argument( '--verbose', '-verbose', \
-        dest='verbose', \
-        help='--verbose example:', \
-        action='store_true' )
-
-        parser.add_argument( '--module', '-module', '--m', '-m', \
-        type=str, \
-        dest='module', \
-        help='--module example:' )
-
-        parser.add_argument( '--r', '-r', \
-        dest='recurse', \
-        help='--recurse example:', \
-        action='store_true' )
-
-        temp_args = parser.parse_args( self.args )
-
-        self.root_dir = temp_args.module
-        self.recurse = temp_args.recurse
+        self.root_dir = self.args.module
+        self.recurse = self.args.recurse
 
         # Default settings when no --module arg is given
         if self.root_dir is None:
@@ -95,32 +49,39 @@ class Cleaner:
         if modules := find_modules( self.root_dir, self.recurse, self.configs ):
             self.modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
 
-        if temp_args.dry is not None:
-            self.dry_run = temp_args.dry
+        if self.args.dry is not None:
+            self.dry_run = self.args.dry
 
-        if temp_args.runners:
-            self.runners_flag = temp_args.runners
+        if self.args.runners:
+            self.runners_flag = self.args.runners
 
-        if temp_args.results:
-            self.results_flag = temp_args.results
+        if self.args.results:
+            self.results_flag = self.args.results
 
-        if temp_args.builds:
-            self.builds_flag = temp_args.builds
+        if self.args.builds:
+            self.builds_flag = self.args.builds
 
-        if (self.runners_flag is False) and (self.results_flag is False) and (self.builds_flag is False):
+        if self.args.scripts:
+            self.scripts_flag = self.args.scripts
+
+        if (self.runners_flag is False) and \
+            (self.results_flag is False) and \
+            (self.builds_flag is False) and \
+            (self.scripts_flag is False):
             self.all_flag = True
 
-        elif temp_args.all is not None and temp_args.all is True:
-            self.all_flag = temp_args.all
+        elif self.args.all is None or self.args.all is True:
+            self.all_flag = self.args.all
             # Override other settings to honor "all" functionality
             self.runners_flag = True
             self.builds_flag = True
             self.results_flag = True
+            self.scripts_flag = True
 
-        if temp_args.venv is not None and temp_args.venv is True:
+        if self.args.venv is not None and self.args.venv is True:
             self.venv_flag = True
 
-        if temp_args.verbose is not None and temp_args.verbose is True:
+        if self.args.verbose is not None and self.args.verbose is True:
             self.verbose = True
 
         # print( "self.root_dir", self.root_dir )
@@ -132,6 +93,7 @@ class Cleaner:
         # print( "self.all_flag", self.all_flag )
         # print( "self.venv_flag", self.venv_flag )
         # print( "self.verbose", self.verbose )
+        # print( "self.scripts", self.scripts_flag )
 
     def delete_file( self, path ):
         if os.path.exists( path ):
@@ -154,11 +116,12 @@ class Cleaner:
         else:
             print( "nothing to clean" )
 
-    def find_files_types( self, dir, prefix, suffix, extension ):
+    def find_files_types( self, dir='.', prefix='', suffix='', extension='' ):
         matches = list()
+        pattern = prefix + ".*" + suffix + extension
+        # print(pattern)
+
         for module_path in self.modules:
-            pattern = prefix + ".*" + suffix + extension
-            # print(pattern)
             for root, dirs, files in os.walk( os.path.join( module_path, dir ) ):
                 # print(root,dirs,files)
                 [matches.append( os.path.join(root, fi) ) for fi in filter(lambda x: re.match(pattern, x), files)]
@@ -196,6 +159,19 @@ class Cleaner:
         # print(results)
         return results
 
+    def find_scripts( self, filename ):
+        scripts = list()
+
+        for module_path in self.modules:
+            script_path = os.path.join( module_path, filename )
+            script_path = script_path.strip("/")
+            script_path = os.path.normpath( script_path )
+
+            if os.path.isfile( script_path ):
+                scripts.append( script_path )
+        # print(scripts)
+        return scripts
+
     def find_files( self ):
         temp_list = list()
 
@@ -213,6 +189,9 @@ class Cleaner:
         if self.all_flag or self.results_flag:
             results = self.find_results()
             [temp_list.append( result ) for result in results if results is not None]
+        if self.all_flag or self.scripts_flag:
+            scripts = self.find_scripts( self.configs["test_script_name"] )
+            [temp_list.append( script ) for script in scripts if scripts is not None]
 
         self.file_clean_list = sorted( temp_list )
 

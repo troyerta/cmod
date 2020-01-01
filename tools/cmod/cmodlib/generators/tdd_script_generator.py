@@ -16,6 +16,8 @@ def print_tdd_script( module_dir, mod_cfg, global_cfg ):
 
     env_path = os.path.join( project_root_dir, 'tools', 'cmod', 'venv', 'bin', 'python3' )
 
+    os.makedirs(module_dir, exist_ok=True)
+
     with open(file_path, "w+") as f:
         f.write('#!' + env_path + '\n')
         f.write('\n')

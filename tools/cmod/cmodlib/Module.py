@@ -16,7 +16,7 @@ class Module:
         self.test_runner_path = None
         self.test_output_filepath = os.path.join( self.path, self.config["results_dir"], self.config["results_txt_prefix"] + self.name.lower() + self.config["results_txt_suffix"] + ".txt" )
 
-        # Override the config setting if a Workspace wants to
+        # Use default if not passed in
         if verbosity is None:
             self.verbosity = int(self.config["default_verbosity"])
         else:
@@ -31,8 +31,12 @@ class Module:
 
     def find_test_src_files( self ):
         find_test_src_regex = r'(?i)' + self.config["test_src_prefix"] + r'.*' + self.config["test_src_suffix"] + r'.c'
-        files_and_dirs = os.listdir( os.path.join( self.path, self.config["test_dir"] ) )
-        # print( files_and_dirs )
+        test_dir_path = os.path.join( self.path, self.config["test_dir"] )
+        if os.path.isdir( test_dir_path ):
+            files_and_dirs = os.listdir( test_dir_path )
+            # print( files_and_dirs )
+        else:
+            return
         test_srcs = list()
 
         for each in files_and_dirs:

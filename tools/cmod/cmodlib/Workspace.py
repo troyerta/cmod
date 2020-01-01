@@ -43,33 +43,11 @@ class Workspace:
         self.ignored = 0
         self.total = 0
 
-    def get_workspace_module_paths( self, argv ):
-        descriptionText = 'Prints a list of modules found under a passed-in directory'
-        usageText = 'cmod workspace [--m|--r]'
-
-        parser = argparse.ArgumentParser( description=descriptionText, usage=usageText )
-
-        parser.add_argument( '--module', '-module', '--m', '-m', \
-        type=str, \
-        dest='module', \
-        help='--module example:' )
-
-        parser.add_argument( '--r', '-r', \
-        dest='recurse', \
-        help='--recurse example:', \
-        action='store_true' )
-
-        parser.add_argument( '--v', '-v', \
-        type=int, \
-        dest='verbosity', \
-        help='--verbosity example:' )
-
-        # print( argv )
-        args = parser.parse_args( argv )
+    def get_workspace_module_paths( self, args ):
         self.root_dir = args.module
         self.recurse = args.recurse
         if args.verbosity is not None:
-            self.verbosity = args.verbosity
+            self.verbosity = int(args.verbosity)
 
         if self.root_dir is None:
             self.root_dir = '.'
