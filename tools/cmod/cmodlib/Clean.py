@@ -108,13 +108,13 @@ class Cleaner:
         # print( self.file_clean_list )
         if self.file_clean_list:
             if self.dry_run is False:
-                print("cleaning..")
+                print("\ncleaning..")
                 [self.delete_file(fi) for fi in self.file_clean_list]
             else:
-                print("would clean:")
-                [print(fi) for fi in self.file_clean_list]
+                print("\nwould clean:")
+            [print(fi) for fi in self.file_clean_list]
         else:
-            print( "nothing to clean" )
+            print( "\nnothing to clean" )
 
     def find_files_types( self, dir='.', prefix='', suffix='', extension='' ):
         matches = list()

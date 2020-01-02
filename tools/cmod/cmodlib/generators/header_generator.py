@@ -15,7 +15,7 @@ def gen_basename_hdr( path ):
     filename += ".h"
     return filename
 
-def gen_path_hdr( module_dir, mod_config ):
+def gen_path_header( module_dir, mod_config ):
     norm_dir = os.path.normpath( module_dir )
     return os.path.normpath( os.path.join( norm_dir, mod_config["src_dir"], gen_basename_hdr( norm_dir ) ) )
 
@@ -31,7 +31,7 @@ def print_included_headers( file, includes ):
 
 def print_header( module_path, module_configs, global_configs ):
     date = get_date_str()
-    file_path = gen_path_hdr( module_path, module_configs )
+    file_path = gen_path_header( module_path, module_configs )
     # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)

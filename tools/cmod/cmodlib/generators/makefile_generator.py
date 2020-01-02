@@ -5,9 +5,12 @@ sys.path.insert(1, '../')
 
 from Utils import splitpath
 
+def gen_path_makefile( module_dir, mod_config ):
+    return os.path.join( module_dir, "Makefile" )
+
 # def print_makefile( file_path, depth, module_config_tag ):
 def print_makefile( module_path, module_configs, global_configs ):
-    file_path = os.path.join( module_path, "Makefile" )
+    file_path = gen_path_makefile( module_path, module_configs )
     # print( file_path )
 
     depth = len( splitpath( file_path )) - 1

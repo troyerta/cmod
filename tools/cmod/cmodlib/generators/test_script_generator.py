@@ -5,10 +5,13 @@ sys.path.insert(1, '../')
 
 from Utils import splitpath
 
+def gen_path_test_script( module_dir, mod_cfg ):
+    return os.path.join( module_dir, mod_cfg["test_script_name"] )
+
 # def print_tdd_script( file_path, depth, module_config_tag ):
-def print_tdd_script( module_dir, mod_cfg, global_cfg ):
+def print_test_script( module_dir, mod_cfg, global_cfg ):
     project_root_dir = '../'
-    file_path = os.path.join( module_dir, mod_cfg["test_script_name"] )
+    file_path = gen_path_test_script( module_dir, mod_cfg )
 
     depth = len( splitpath( file_path )) - 1
     for each in range(depth-1):

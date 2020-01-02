@@ -4,20 +4,7 @@ import sys
 sys.path.insert(1, '../')
 
 from Utils import get_date_str, splitpath
-
-def gen_basename_hdr( path ):
-    path_parts = splitpath(path)
-
-    if len(path_parts) > 1:
-        filename = path_parts[-1].lower()
-    else:
-        filename = path_parts[0].lower()
-    filename += ".h"
-    return filename
-
-def gen_path_hdr( module_dir, mod_config ):
-    norm_dir = os.path.normpath( module_dir )
-    return os.path.normpath( os.path.join( mod_config["src_dir"], gen_basename_hdr( norm_dir ) ) )
+from header_generator import gen_path_header
 
 def gen_basename_src( path ):
     path_parts = splitpath(path)
@@ -44,7 +31,7 @@ def print_include_potential_header( file, header_name ):
 def print_source( module_path, module_configs, global_configs ):
     date = get_date_str()
     file_path = gen_path_src( module_path, module_configs )
-    header_include = gen_path_hdr( module_path, module_configs )
+    header_include = gen_path_header( module_path, module_configs )
     # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
