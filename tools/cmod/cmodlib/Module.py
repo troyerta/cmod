@@ -5,6 +5,14 @@ import subprocess
 
 from Unity import TestSrc, TestResult, UnityOutput, TestSummary
 
+def do_test_cycle( module ):
+    module.find_test_src_files()
+    module.find_tests_and_groups()
+    module.gen_test_runner()
+    module.run_makefile()
+    module.get_test_results()
+    module.print_test_results()
+
 class Module:
     def __init__( self, path, configs, verbosity=None ):
         self.path = os.path.normpath( path )
@@ -209,3 +217,4 @@ class Module:
         self.run_makefile()
         self.get_test_results()
         self.print_test_results()
+
