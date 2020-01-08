@@ -157,10 +157,17 @@ Cmod Project:
 - Removes venv
 - Sets up venv
 - Adds package to venv, updates requirements.txt
-python3.8 -m venv tools/venv
+python3.8 -m venv tools/cmod/venv
 source tools/venv/bin/activate
 pip3.8 install -r requirements.txt
 deactivate - TODO: make the tools/ dir configurable when setup.py runs
 
 [=====     ] - Start adding other python modules
 [          ] - look into adding pre-post-commit git hooks for doing some more stuff automatically
+
+
+
+
+
+
+

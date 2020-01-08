@@ -3,7 +3,7 @@ import sys
 import re
 import argparse
 
-from Module import Module
+from Module import Module, do_test_cycle
 from Utils import find_modules
 
 # This class does has all the same stuff as

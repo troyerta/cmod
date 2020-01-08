@@ -3,6 +3,8 @@ import sys
 import argparse
 import re
 from TaskQueue import run
+from ProcQueue import multi_proc
+import time
 
 sys.path.insert(1, 'tools/cmod/cmodlib/generators')
 
@@ -246,18 +248,23 @@ def handle_test( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
     wksp = Workspace( args, mod_cfg=mod_cfg )
 
-    if wksp.num_modules > 40:
-        from Module import do_test_cycle
+    if wksp.num_modules > 0:
+        # from Module import do_test_cycle
         # Start a parallel process queue
-        run( do_test_cycle, wksp.module_objs )
+        start = time.time()
+        multi_proc()
+        print(f'Time taken = {time.time() - start:.10f}')
+        # run( do_test_cycle, wksp.module_objs )
     else:
         # Runs tests with current process
+        start = time.time()
         wksp.find_wksp_test_src_files()
         wksp.find_wksp_tests_and_groups()
         wksp.gen_wksp_test_runners()
         wksp.run_wksp_tests()
         wksp.calculate_test_result_totals()
         wksp.print_test_summary()
+        print(f'Time taken = {time.time() - start:.10f}')
 
 def handle_clean( args, global_cfg, mod_cfg ):
     from Clean import Cleaner
