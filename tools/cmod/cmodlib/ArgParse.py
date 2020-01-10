@@ -246,14 +246,15 @@ def handle_analyze( args, global_cfg, mod_cfg ):
 # single module
 def handle_test( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
+    from Module import do_test_cycle
     wksp = Workspace( args, mod_cfg=mod_cfg )
 
-    if wksp.num_modules > 0:
+    if wksp.num_modules > 11:
         # from Module import do_test_cycle
         # Start a parallel process queue
         start = time.time()
-        multi_proc()
-        print(f'Time taken = {time.time() - start:.10f}')
+        multi_proc( do_test_cycle, wksp.module_objs )
+        print(f'Time taken = {time.time() - start:.2f}')
         # run( do_test_cycle, wksp.module_objs )
     else:
         # Runs tests with current process

@@ -2,16 +2,9 @@ from multiprocessing import Lock, Process, Queue, current_process, cpu_count
 import time
 import queue # imported for using queue.Empty exception
 
-# PROCESSES = cpu_count() - 1
-
-def do_job(tasks_to_accomplish, tasks_that_are_done):
+def do_job(tasks_to_accomplish, tasks_that_are_done, function):
     while True:
         try:
-            '''
-                try to get task from the queue. get_nowait() function will
-                raise queue.Empty exception if the queue is empty.
-                queue(False) function would do the same task also.
-            '''
             task = tasks_to_accomplish.get_nowait()
         except queue.Empty:
 
@@ -22,40 +15,37 @@ def do_job(tasks_to_accomplish, tasks_that_are_done):
                 message to task_that_are_done queue
             '''
             # print(task)
-            tasks_that_are_done.put(task + ' is done by ' + current_process().name)
+            # time.sleep(.2)
+            function( task )
+            tasks_that_are_done.put(task.name + ' was tested by ' + current_process().name)
             time.sleep(.2)
     return True
 
 
-def multi_proc():
-    number_of_task = 20
+def multi_proc( function, module_list ):
+    number_of_task = 50
+    # number_of_processes = cpu_count() - 1
     number_of_processes = 7
     tasks_to_accomplish = Queue()
     tasks_that_are_done = Queue()
     processes = []
 
-    for i in range(number_of_task):
-        tasks_to_accomplish.put("Task no " + str(i))
+    # for i in range(number_of_task):
+        # tasks_to_accomplish.put("Task no " + str(i))
+
+    [tasks_to_accomplish.put( module ) for module in module_list]
 
     # creating processes
     for w in range(number_of_processes):
-        p = Process(target=do_job, args=(tasks_to_accomplish, tasks_that_are_done))
+        p = Process(target=do_job, args=(tasks_to_accomplish, tasks_that_are_done, function))
         processes.append(p)
         p.start()
 
-    # completing process
-    # for p in processes:
-        # p.join()
-
     # print the output
-    # while not tasks_that_are_done.empty() and not tasks_to_accomplish.empty():
-    # while not tasks_to_accomplish.empty():
-        # while not tasks_that_are_done.empty():
-            # print(tasks_that_are_done.get( False ))
-    for i in range(number_of_task):
-        print(tasks_that_are_done.get( True ))
+    tasks_ackd = 0
+    while tasks_to_accomplish.qsize() > 0 or tasks_ackd < len(module_list):
+    # for i in range(number_of_task):
+        print(tasks_that_are_done.get( True, timeout=5.0 ))
+        tasks_ackd += 1
 
-    for p in processes:
-        p.join()
-
-    return True
+    [p.join() for p in processes]
