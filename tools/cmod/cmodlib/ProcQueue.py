@@ -23,9 +23,7 @@ def do_job(tasks_to_accomplish, tasks_that_are_done, function):
 
 
 def multi_proc( function, module_list ):
-    number_of_task = 50
-    # number_of_processes = cpu_count() - 1
-    number_of_processes = 7
+    number_of_processes = cpu_count() - 1
     tasks_to_accomplish = Queue()
     tasks_that_are_done = Queue()
     processes = []

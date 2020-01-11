@@ -96,7 +96,10 @@ General:
 - Explore the cost of asking for this constraint.
 - Might still be nice to have custom settings possible for each module
 [          ] - Define a task queue that sends jobs to a process pool using python multiprocessing
-
+[          ] - Add timing attr to each test run process
+[          ] - Add --version argument
+[          ] - Add a carraige return output mode option config
+[          ] - Print during test, or only after test is complete - config
 
 
 

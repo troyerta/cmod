@@ -250,7 +250,7 @@ def handle_test( args, global_cfg, mod_cfg ):
     wksp = Workspace( args, mod_cfg=mod_cfg )
 
     if wksp.num_modules > 11:
-        # from Module import do_test_cycle
+        from Module import do_test_cycle
         # Start a parallel process queue
         start = time.time()
         multi_proc( do_test_cycle, wksp.module_objs )
