@@ -35,11 +35,13 @@ def print_header( module_path, module_configs, global_configs ):
     # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
     project_name = global_configs["project"]
-    author = global_configs["author"]
-    license = global_configs["license"]
-    repo = global_configs["repo"]
-    include_guard = '_' + os.path.splitext(basename)[0].upper() + '_' + 'H' + '_'
+    author       = global_configs["author" ]
+    license      = global_configs["license"]
+    repo         = global_configs["repo"   ]
+
+    include_guard = '_' + os.path.splitext(basename)[0].upper() + '_H_'
 
     with open(file_path, "w+") as f:
         f.write('/**********************************************************\n')

@@ -31,8 +31,10 @@ if __name__ == "__main__":
     from Config import Config
     from ArgParse import ArgParser
 
+    sys.path.insert( 0, os.getcwd() )
+
     config = Config()
-    cmod_arg_parser = ArgParser( sys.argv[1:], \
-        config.get_section_items('GLOBAL'), \
-        config.get_section_items('DEFAULT_MODULE_STRUCTURE') )
+    cmod_arg_parser = ArgParser( sys.argv[1:],                \
+        global_configs=config.get_section_items('GLOBAL'),                   \
+        module_configs=config.get_section_items('DEFAULT_MODULE_STRUCTURE')  )
     cmod_arg_parser.cmod_entry()

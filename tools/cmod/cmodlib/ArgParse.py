@@ -151,7 +151,7 @@ cmd_arg_types = [ \
     workspace_args \
     ]
 
-def handle_help( args, global_cfg, mod_cfg ):
+def handle_help( args, global_cfg, mod_cfg, style_cfg ):
     print("handling help")
 
 def get_generators( types ):
@@ -168,18 +168,42 @@ def get_generators( types ):
         gen_flags.append( "script" )
     return gen_flags
 
-def handle_generate( args, global_cfg, mod_cfg ):
-    from Generate import Generate
-    from source_generator import print_source, gen_path_src
-    from header_generator import print_header, gen_path_header
+def handle_generate( args, global_cfg, mod_cfg, style_cfg ):
+    # # Look at the Style configs to determine if we have valid, callable functions
+    # hook_source = os.path.splitext( os.path.normpath( style_cfg["hook_source"] ) )[0]
+    # # print( hook_source )
+
+    # _hooks = __import__( hook_source, globals(), locals(), [], 0 )
+    # header_filename_hook = getattr( _hooks, style_cfg["generator_header_filename_hook"] )
+    # source_filename_hook = getattr( _hooks, style_cfg["generator_source_filename_hook"] )
+    # module_name_hook     = getattr( _hooks, style_cfg["generator_module_name_hook"    ] )
+
+    # if not callable(header_filename_hook):
+    #     print( style_cfg["generator_header_filename_hook"], "is not callable" )
+    #     sys.exit()
+    # if not callable(source_filename_hook):
+    #     print( style_cfg["generator_source_filename_hook"], "is not callable" )
+    #     sys.exit()
+    # if not callable(module_name_hook):
+    #     print( style_cfg["generator_module_name_hook"], "is not callable" )
+    #     sys.exit()
+
+    # header_filename_hook()
+    # source_filename_hook()
+    # module_name_hook()
+
+    from source_generator      import print_source, gen_path_src
+    from header_generator      import print_header, gen_path_header
     from test_source_generator import print_test_source, gen_path_test_source
     from test_script_generator import print_test_script, gen_path_test_script
-    from makefile_generator import print_makefile, gen_path_makefile
+    from makefile_generator    import print_makefile, gen_path_makefile
+
     # Make sure raw path arg string has no leading slash
-
     module_dir = args.module.lstrip("/")
-    # print( args.types )
+    # print( module_dir )
 
+    # If user passed in specifc generattor flags, handle those only
+    # print( args.types )
     if args.types is not None:
         types = get_generators( args.types )
     else:
@@ -221,30 +245,30 @@ def handle_generate( args, global_cfg, mod_cfg ):
     # print( args )
 
 
-def handle_list( args, global_cfg, mod_cfg ):
+def handle_list( args, global_cfg, mod_cfg, style_cfg ):
     from Workspace import Workspace
     wksp = Workspace( args=args, mod_cfg=mod_cfg )
     wksp.print_module_names()
 
-def handle_tree( args, global_cfg, mod_cfg ):
+def handle_tree( args, global_cfg, mod_cfg, style_cfg ):
     from Tree import tree
     tree( args )
 
-def handle_report( args, global_cfg, mod_cfg ):
+def handle_report( args, global_cfg, mod_cfg, style_cfg ):
     print("handling report\n")
 
-def handle_stat( args, global_cfg, mod_cfg ):
+def handle_stat( args, global_cfg, mod_cfg, style_cfg ):
     print("handling stat\n")
 
-def handle_format( args, global_cfg, mod_cfg ):
+def handle_format( args, global_cfg, mod_cfg, style_cfg ):
     print("handling format\n")
 
-def handle_analyze( args, global_cfg, mod_cfg ):
+def handle_analyze( args, global_cfg, mod_cfg, style_cfg ):
     print("handling analyze\n")
 
 # Change this to a function that only operates on a
 # single module
-def handle_test( args, global_cfg, mod_cfg ):
+def handle_test( args, global_cfg, mod_cfg, style_cfg ):
     from Workspace import Workspace
     from Module import do_test_cycle
     wksp = Workspace( args, mod_cfg=mod_cfg )
@@ -267,7 +291,7 @@ def handle_test( args, global_cfg, mod_cfg ):
         wksp.print_test_summary()
         print(f'Time taken = {time.time() - start:.10f}')
 
-def handle_clean( args, global_cfg, mod_cfg ):
+def handle_clean( args, global_cfg, mod_cfg, style_cfg ):
     from Clean import Cleaner
     cleaner = Cleaner( args, mod_cfg )
     cleaner.find_files()
@@ -331,15 +355,17 @@ class CmodCommand:
             [parser.add_argument( *arg[0], **arg[1] ) for arg in self.arg_types]
             self.arg_namespace = parser.parse_args( args )
 
-    def run( self, global_config, module_config ):
-        self.handler( self.arg_namespace, global_config, module_config )
+    # This where configs and arguments are passed to Cmod commands
+    def run( self, global_config, module_config, style_config ):
+        self.handler( self.arg_namespace, global_config, module_config, style_config )
 
 # This class applies the passed arguments and configs to a cmod command, then runs it
 class ArgParser:
-    def __init__( self, sys_args=None, global_configs=None, module_configs=None ):
+    def __init__( self, sys_args=None, global_configs=None, module_configs=None, style_configs=None ):
         self.args = sys_args
         self.global_config = global_configs
         self.module_config = module_configs
+        self.style_config  = style_configs
 
     # Get the intended command, setup the command to run, and run it
     def cmod_entry( self ):
@@ -347,5 +373,5 @@ class ArgParser:
         self.args.remove( self.args[0] )
         command = CmodCommand( cmd )
         command.get_arg_namespace( self.args )
-        command.run( self.global_config, self.module_config )
+        command.run( self.global_config, self.module_config, self.style_config )
         sys.exit()

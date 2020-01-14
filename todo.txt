@@ -85,6 +85,39 @@ Generation:
 [==        ] - Make generator addition/deletion configurable
 [          ] - Make a module exporter (generates makefile and copies test harness to a target dir for testing module outside of project)
 $ cmod export --m=dsp --r --o=../dsp
+[          ] - Refactor the way generation works
+    - Module generation is done with a list of file generators
+    - file generators are python modules in some dir, that contain callbacks that cmod uses to create the a file
+    - Multiple file generators can live in the same style_hooks.py module to define a consistent generation style, (K&R, allman, Hungarian naming notation)
+    - Multiple modules can exist in the same project, and just need to be called out in config.ini
+    - Each file generator must define the following callbacks:
+        - gen_filename() - What the file is named
+        - gen_filepath() - Where the file lives
+        - gen_file()     - implements the code style with file write operations
+    - Each generator has a name
+    - A module generator is just a list of file generators
+        - The list can be specifed explicitly, or with a name group of generators that define a coding style
+    - DEFAULT_MODULE_STRUCTURE and STYLE sections should be merged, and then called out as a single "style" element in the config
+    - Or just put all the options under "MODULE_DEF_A", so another set of options could live in "MODULE_DEF_B"
+    - And we could also specify a "DEFAULT_MODULE_DEF" section to fall back on if an option is not present in "MODULE_DEF_A"
+    - Remove style_config args - it's now unnecessary
+
+Add option to randomize during testing:
+  module list
+  test group list
+  test list
+
+import io
+io.__file__ - name and path of module file from which it is loaded
+io.__dict__ - dictionary are all attributes and functions
+
+[        ] - liminate literal magic string in accesses to module_configs dict so the list of expected config key
+
+[         ] - go from:
+name = mod_configs["some_name_setting"]
+move to:
+name_setting_key = "some_name_setting"
+name = mod_configs[name_setting_key]
 
 General:
 [=         ] - Finish "help" messages in scripts
