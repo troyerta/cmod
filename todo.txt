@@ -111,7 +111,9 @@ import io
 io.__file__ - name and path of module file from which it is loaded
 io.__dict__ - dictionary are all attributes and functions
 
-[        ] - liminate literal magic string in accesses to module_configs dict so the list of expected config key
+[        ] - Config class should become a dictionary of dictionaries (or sections)
+[        ] - Need a function that converts Configs to a module definition class, filling in defaults as necessary
+[        ] - Eliminate literal magic string in accesses to module_configs dict so the list of expected config key
 
 [         ] - go from:
 name = mod_configs["some_name_setting"]

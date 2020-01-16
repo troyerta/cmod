@@ -151,7 +151,7 @@ cmd_arg_types = [ \
     workspace_args \
     ]
 
-def handle_help( args, global_cfg, mod_cfg, style_cfg ):
+def handle_help( args, global_cfg, mod_cfg ):
     print("handling help")
 
 def get_generators( types ):
@@ -168,7 +168,7 @@ def get_generators( types ):
         gen_flags.append( "script" )
     return gen_flags
 
-def handle_generate( args, global_cfg, mod_cfg, style_cfg ):
+def handle_generate( args, global_cfg, mod_cfg ):
     # # Look at the Style configs to determine if we have valid, callable functions
     # hook_source = os.path.splitext( os.path.normpath( style_cfg["hook_source"] ) )[0]
     # # print( hook_source )
@@ -245,30 +245,30 @@ def handle_generate( args, global_cfg, mod_cfg, style_cfg ):
     # print( args )
 
 
-def handle_list( args, global_cfg, mod_cfg, style_cfg ):
+def handle_list( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
     wksp = Workspace( args=args, mod_cfg=mod_cfg )
     wksp.print_module_names()
 
-def handle_tree( args, global_cfg, mod_cfg, style_cfg ):
+def handle_tree( args, global_cfg, mod_cfg ):
     from Tree import tree
     tree( args )
 
-def handle_report( args, global_cfg, mod_cfg, style_cfg ):
+def handle_report( args, global_cfg, mod_cfg ):
     print("handling report\n")
 
-def handle_stat( args, global_cfg, mod_cfg, style_cfg ):
+def handle_stat( args, global_cfg, mod_cfg ):
     print("handling stat\n")
 
-def handle_format( args, global_cfg, mod_cfg, style_cfg ):
+def handle_format( args, global_cfg, mod_cfg ):
     print("handling format\n")
 
-def handle_analyze( args, global_cfg, mod_cfg, style_cfg ):
+def handle_analyze( args, global_cfg, mod_cfg ):
     print("handling analyze\n")
 
 # Change this to a function that only operates on a
 # single module
-def handle_test( args, global_cfg, mod_cfg, style_cfg ):
+def handle_test( args, global_cfg, mod_cfg ):
     from Workspace import Workspace
     from Module import do_test_cycle
     wksp = Workspace( args, mod_cfg=mod_cfg )
@@ -291,7 +291,7 @@ def handle_test( args, global_cfg, mod_cfg, style_cfg ):
         wksp.print_test_summary()
         print(f'Time taken = {time.time() - start:.10f}')
 
-def handle_clean( args, global_cfg, mod_cfg, style_cfg ):
+def handle_clean( args, global_cfg, mod_cfg ):
     from Clean import Cleaner
     cleaner = Cleaner( args, mod_cfg )
     cleaner.find_files()
