@@ -5,12 +5,12 @@ sys.path.insert(1, '../')
 
 from Utils import splitpath
 
-def gen_path_makefile( module_dir, mod_config ):
+def gen_path_makefile( module_dir, configs ):
     return os.path.join( module_dir, "Makefile" )
 
 # def print_makefile( file_path, depth, module_config_tag ):
-def print_makefile( module_path, module_configs, global_configs ):
-    file_path = gen_path_makefile( module_path, module_configs )
+def print_makefile( module_path, configs ):
+    file_path = gen_path_makefile( module_path, configs )
     # print( file_path )
 
     depth = len( splitpath( file_path )) - 1
@@ -29,19 +29,19 @@ def print_makefile( module_path, module_configs, global_configs ):
         # Make this part test harness agnostic as well
         f.write( 'MODULE_DIR = ' + os.path.dirname( file_path ) + '\n' )
         f.write( 'PROJ_ROOT = ' + project_root_dir + '\n' )
-        f.write( 'SRC_DIR = ' + module_configs['src_dir'] + '\n' )
-        f.write( 'TEST_DIR = ' + module_configs['test_dir'] + '\n' )
-        f.write( 'RUNNER_DIR = ' + module_configs['runner_dir'] + '\n' )
-        f.write( 'OBJ_DIR = ' + module_configs['obj_dir'] + '\n' )
-        f.write( 'ARTIFACTS_DIR = ' + module_configs['artifacts_dir'] + '\n' )
-        f.write( 'EXE_DIR = ' + module_configs['exe_dir'] + '\n' )
-        f.write( 'RESULTS_DIR = ' + module_configs['results_dir'] + '\n' )
-        f.write( 'TEST_SRC_PREFIX = ' + module_configs['test_src_prefix'] + '\n' )
-        f.write( 'TEST_SRC_SUFFIX = ' + module_configs['test_src_suffix'] + '\n' )
-        f.write( 'RUNNER_SRC_PREFIX = ' + module_configs['runner_src_prefix'] + '\n' )
-        f.write( 'RUNNER_SRC_SUFFIX = ' + module_configs['runner_src_suffix'] + '\n' )
-        f.write( 'RESULTS_TXT_PREFIX = ' + module_configs['results_txt_prefix'] + '\n' )
-        f.write( 'RESULTS_TXT_SUFFIX = ' + module_configs['results_txt_suffix'] + '\n' )
+        f.write( 'SRC_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['src_dir'] + '\n' )
+        f.write( 'TEST_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['test_dir'] + '\n' )
+        f.write( 'RUNNER_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['runner_dir'] + '\n' )
+        f.write( 'OBJ_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['obj_dir'] + '\n' )
+        f.write( 'ARTIFACTS_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['artifacts_dir'] + '\n' )
+        f.write( 'EXE_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['exe_dir'] + '\n' )
+        f.write( 'RESULTS_DIR = ' + configs["DEFAULT_MODULE_STRUCTURE"]['results_dir'] + '\n' )
+        f.write( 'TEST_SRC_PREFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['test_src_prefix'] + '\n' )
+        f.write( 'TEST_SRC_SUFFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['test_src_suffix'] + '\n' )
+        f.write( 'RUNNER_SRC_PREFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['runner_src_prefix'] + '\n' )
+        f.write( 'RUNNER_SRC_SUFFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['runner_src_suffix'] + '\n' )
+        f.write( 'RESULTS_TXT_PREFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['results_txt_prefix'] + '\n' )
+        f.write( 'RESULTS_TXT_SUFFIX = ' + configs["DEFAULT_MODULE_STRUCTURE"]['results_txt_suffix'] + '\n' )
         f.write( 'include ' + template_path )
         f.write( '\n' )
         f.close()

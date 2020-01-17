@@ -22,11 +22,11 @@ class Module:
         self.test_src_paths = list()  # list of paths
         self.test_groups = list()
         self.test_runner_path = None
-        self.test_output_filepath = os.path.join( self.path, self.config["results_dir"], self.config["results_txt_prefix"] + self.name.lower() + self.config["results_txt_suffix"] + ".txt" )
+        self.test_output_filepath = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["results_dir"], self.config["DEFAULT_MODULE_STRUCTURE"]["results_txt_prefix"] + self.name.lower() + self.config["DEFAULT_MODULE_STRUCTURE"]["results_txt_suffix"] + ".txt" )
 
         # Use default if not passed in
         if verbosity is None:
-            self.verbosity = int(self.config["default_verbosity"])
+            self.verbosity = int(self.config["DEFAULT_MODULE_STRUCTURE"]["default_verbosity"])
         else:
             self.verbosity = verbosity
 
@@ -38,8 +38,8 @@ class Module:
         return str( self.path )
 
     def find_test_src_files( self ):
-        find_test_src_regex = r'(?i)' + self.config["test_src_prefix"] + r'.*' + self.config["test_src_suffix"] + r'.c'
-        test_dir_path = os.path.join( self.path, self.config["test_dir"] )
+        find_test_src_regex = r'(?i)' + self.config["DEFAULT_MODULE_STRUCTURE"]["test_src_prefix"] + r'.*' + self.config["DEFAULT_MODULE_STRUCTURE"]["test_src_suffix"] + r'.c'
+        test_dir_path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["test_dir"] )
         if os.path.isdir( test_dir_path ):
             files_and_dirs = os.listdir( test_dir_path )
             # print( files_and_dirs )
@@ -52,7 +52,7 @@ class Module:
             if match:
                 test_srcs.append(match[0])
         for file in test_srcs:
-            path = os.path.join( self.path, self.config["test_dir"], file )
+            path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["test_dir"], file )
             self.test_src_paths.append( path )
             self.test_sources.append( TestSrc( path ) )
         self.test_src_paths.sort()
@@ -68,9 +68,9 @@ class Module:
     def gen_test_runner( self ):
         # For each test group object, make a call to it's runner in a new file
         basename = os.path.splitext( os.path.basename( self.path ))
-        test_runner_basename = self.config["runner_src_prefix"] + basename[0].lower() + self.config["runner_src_suffix"] +'.c'
-        self.test_runner_path = os.path.join( self.path, self.config["runner_dir"], test_runner_basename )
-        os.makedirs( os.path.join( self.path, self.config["runner_dir"]), exist_ok=True )
+        test_runner_basename = self.config["DEFAULT_MODULE_STRUCTURE"]["runner_src_prefix"] + basename[0].lower() + self.config["DEFAULT_MODULE_STRUCTURE"]["runner_src_suffix"] +'.c'
+        self.test_runner_path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["runner_dir"], test_runner_basename )
+        os.makedirs( os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["runner_dir"]), exist_ok=True )
         # print( 'test_runner_path =', self.test_runner_path)
 
         with open(self.test_runner_path, "w+") as f:

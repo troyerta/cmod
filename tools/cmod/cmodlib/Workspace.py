@@ -23,11 +23,10 @@ def make_progress_str( total, progress ):
     return output
 
 class Workspace:
-    def __init__(self, args=None, global_cfg=None, mod_cfg=None):
+    def __init__(self, args=None, configs=None, mod_cfg=None):
         self.root_dir = None
-        self.global_cfg = global_cfg
-        self.mod_cfg = mod_cfg
-        self.verbosity = int(self.mod_cfg["default_verbosity"])
+        self.configs = configs
+        self.verbosity = int(self.configs["DEFAULT_MODULE_STRUCTURE"]["default_verbosity"])
         self.module_path_list = self.get_workspace_module_paths( args )
         self.module_objs = self.get_module_objects()
 
@@ -53,7 +52,7 @@ class Workspace:
             self.root_dir = '.'
             self.recurse = True
         # This function can also be used to make Module objects when we need to do some testing
-        modules = find_modules( self.root_dir, self.recurse, self.mod_cfg )
+        modules = find_modules( self.root_dir, self.recurse, self.configs )
         modules = [os.path.dirname( os.path.normpath( module ) ) for module in modules if modules]
         if len(modules) > 1 and self.verbosity > 1:
             print("Finding modules..", end='')
@@ -77,7 +76,7 @@ class Workspace:
             return None
 
     def get_module_objects( self ):
-        module_objs = [Module( module, self.mod_cfg, self.verbosity ) for module in self.module_path_list]
+        module_objs = [Module( module, self.configs, self.verbosity ) for module in self.module_path_list]
         if len(module_objs) > 1 and self.verbosity > 1:
             print("[" + str(len(module_objs)) + "]")
         return module_objs

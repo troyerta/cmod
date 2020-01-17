@@ -151,7 +151,7 @@ cmd_arg_types = [ \
     workspace_args \
     ]
 
-def handle_help( args, global_cfg, mod_cfg ):
+def handle_help( args, configs ):
     print("handling help")
 
 def get_generators( types ):
@@ -168,7 +168,7 @@ def get_generators( types ):
         gen_flags.append( "script" )
     return gen_flags
 
-def handle_generate( args, global_cfg, mod_cfg ):
+def handle_generate( args, configs ):
     # # Look at the Style configs to determine if we have valid, callable functions
     # hook_source = os.path.splitext( os.path.normpath( style_cfg["hook_source"] ) )[0]
     # # print( hook_source )
@@ -212,15 +212,15 @@ def handle_generate( args, global_cfg, mod_cfg ):
 
     print('')
     if "source" in types:
-        print( gen_path_src( module_dir, mod_cfg ) )
+        print( gen_path_src( module_dir, configs ) )
     if "header" in types:
-        print( gen_path_header( module_dir, mod_cfg ) )
+        print( gen_path_header( module_dir, configs ) )
     if "test_source" in types:
-        print( gen_path_test_source( module_dir, mod_cfg ) )
+        print( gen_path_test_source( module_dir, configs ) )
     if "makefile" in types:
-        print( gen_path_makefile( module_dir, mod_cfg ) )
+        print( gen_path_makefile( module_dir, configs ) )
     if "script" in types:
-        print( gen_path_test_script( module_dir, mod_cfg ) )
+        print( gen_path_test_script( module_dir, configs ) )
     print('')
 
     # print( types )
@@ -228,15 +228,15 @@ def handle_generate( args, global_cfg, mod_cfg ):
 
     if answer != 'n':
         if "source" in types:
-            print_source( module_dir, mod_cfg, global_cfg )
+            print_source( module_dir, configs )
         if "header" in types:
-            print_header( module_dir, mod_cfg, global_cfg )
+            print_header( module_dir, configs )
         if "test_source" in types:
-            print_test_source( module_dir, mod_cfg, global_cfg )
+            print_test_source( module_dir, configs )
         if "makefile" in types:
-            print_makefile( module_dir, mod_cfg, global_cfg )
+            print_makefile( module_dir, configs )
         if "script" in types:
-            print_test_script( module_dir, mod_cfg, global_cfg )
+            print_test_script( module_dir, configs )
 
     else:
         print("canceled")
@@ -245,33 +245,33 @@ def handle_generate( args, global_cfg, mod_cfg ):
     # print( args )
 
 
-def handle_list( args, global_cfg, mod_cfg ):
+def handle_list( args, configs ):
     from Workspace import Workspace
-    wksp = Workspace( args=args, mod_cfg=mod_cfg )
+    wksp = Workspace( args=args, configs=configs )
     wksp.print_module_names()
 
-def handle_tree( args, global_cfg, mod_cfg ):
+def handle_tree( args, configs ):
     from Tree import tree
     tree( args )
 
-def handle_report( args, global_cfg, mod_cfg ):
+def handle_report( args, configs ):
     print("handling report\n")
 
-def handle_stat( args, global_cfg, mod_cfg ):
+def handle_stat( args, configs ):
     print("handling stat\n")
 
-def handle_format( args, global_cfg, mod_cfg ):
+def handle_format( args, configs ):
     print("handling format\n")
 
-def handle_analyze( args, global_cfg, mod_cfg ):
+def handle_analyze( args, configs ):
     print("handling analyze\n")
 
 # Change this to a function that only operates on a
 # single module
-def handle_test( args, global_cfg, mod_cfg ):
+def handle_test( args, configs ):
     from Workspace import Workspace
     from Module import do_test_cycle
-    wksp = Workspace( args, mod_cfg=mod_cfg )
+    wksp = Workspace( args, configs=configs )
 
     if wksp.num_modules > 11:
         from Module import do_test_cycle
@@ -356,16 +356,14 @@ class CmodCommand:
             self.arg_namespace = parser.parse_args( args )
 
     # This where configs and arguments are passed to Cmod commands
-    def run( self, global_config, module_config, style_config ):
-        self.handler( self.arg_namespace, global_config, module_config, style_config )
+    def run( self, configs ):
+        self.handler( self.arg_namespace, configs )
 
 # This class applies the passed arguments and configs to a cmod command, then runs it
 class ArgParser:
-    def __init__( self, sys_args=None, global_configs=None, module_configs=None, style_configs=None ):
+    def __init__( self, sys_args=None, configs=None ):
         self.args = sys_args
-        self.global_config = global_configs
-        self.module_config = module_configs
-        self.style_config  = style_configs
+        self.configs = configs
 
     # Get the intended command, setup the command to run, and run it
     def cmod_entry( self ):
@@ -373,5 +371,5 @@ class ArgParser:
         self.args.remove( self.args[0] )
         command = CmodCommand( cmd )
         command.get_arg_namespace( self.args )
-        command.run( self.global_config, self.module_config, self.style_config )
+        command.run( self.configs )
         sys.exit()

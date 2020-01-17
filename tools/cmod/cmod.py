@@ -33,8 +33,13 @@ if __name__ == "__main__":
 
     sys.path.insert( 0, os.getcwd() )
 
-    config = Config()
-    cmod_arg_parser = ArgParser( sys.argv[1:],                \
-        global_configs=config.get_section_items('GLOBAL'),                   \
-        module_configs=config.get_section_items('DEFAULT_MODULE_STRUCTURE')  )
+    config_parser = Config()
+    configs = config_parser.get_configs()
+
+    # for section in configs.keys():
+        # print(section)
+        # for x in configs[section].keys():
+            # print('    ', x, ':', configs[section][x])
+
+    cmod_arg_parser = ArgParser( sys.argv[1:], configs=configs )
     cmod_arg_parser.cmod_entry()

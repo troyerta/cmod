@@ -16,9 +16,9 @@ def gen_basename_src( path ):
     filename += ".c"
     return filename
 
-def gen_path_src( module_dir, mod_config ):
+def gen_path_src( module_dir, configs ):
     norm_dir = os.path.normpath( module_dir )
-    return os.path.normpath( os.path.join( norm_dir, mod_config["src_dir"], gen_basename_src( norm_dir ) ) )
+    return os.path.normpath( os.path.join( norm_dir, configs["DEFAULT_MODULE_STRUCTURE"]["src_dir"], gen_basename_src( norm_dir ) ) )
 
 def print_section_header( file, name ):
     file.write('/**********************************************************\n')
@@ -28,17 +28,17 @@ def print_section_header( file, name ):
 def print_include_potential_header( file, header_name ):
     file.write('// #include \"' + header_name + '\"\n')
 
-def print_source( module_path, module_configs, global_configs ):
+def print_source( module_path, configs ):
     date = get_date_str()
-    file_path = gen_path_src( module_path, module_configs )
-    header_include = gen_path_header( module_path, module_configs )
+    file_path = gen_path_src( module_path, configs )
+    header_include = gen_path_header( module_path, configs )
     # print( file_path )
     basename = os.path.normpath( os.path.basename( file_path ) )
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    project_name = global_configs["project"]
-    author = global_configs["author"]
-    license = global_configs["license"]
-    repo = global_configs["repo"]
+    project_name = configs["GLOBAL"]["project"]
+    author = configs["GLOBAL"]["author"]
+    license = configs["GLOBAL"]["license"]
+    repo = configs["GLOBAL"]["repo"]
 
     with open(file_path, "w+") as f:
         f.write('/**********************************************************\n')

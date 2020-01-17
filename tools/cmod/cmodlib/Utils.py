@@ -30,8 +30,8 @@ def find_module_dirs_recursive( module, marker_type, marker_name ):
 def find_modules( root_dir, recurse, configs ):
     matches = list()
 
-    marker_type = configs["module_marker_type"]
-    marker_name = configs["module_marker_name"]
+    marker_type = configs["DEFAULT_MODULE_STRUCTURE"]["module_marker_type"]
+    marker_name = configs["DEFAULT_MODULE_STRUCTURE"]["module_marker_name"]
 
     # Check for valid config.ini marker settings
     if marker_type != "directory" and marker_type != "file":
