@@ -169,28 +169,32 @@ def get_generators( types ):
     return gen_flags
 
 def handle_generate( args, configs ):
-    # # Look at the Style configs to determine if we have valid, callable functions
-    # hook_source = os.path.splitext( os.path.normpath( style_cfg["hook_source"] ) )[0]
-    # # print( hook_source )
+    # From FileDef import FileDef
+    # From Generator import Generator
 
-    # _hooks = __import__( hook_source, globals(), locals(), [], 0 )
-    # header_filename_hook = getattr( _hooks, style_cfg["generator_header_filename_hook"] )
-    # source_filename_hook = getattr( _hooks, style_cfg["generator_source_filename_hook"] )
-    # module_name_hook     = getattr( _hooks, style_cfg["generator_module_name_hook"    ] )
+    # try_to_import_hooks_module
 
-    # if not callable(header_filename_hook):
-    #     print( style_cfg["generator_header_filename_hook"], "is not callable" )
-    #     sys.exit()
-    # if not callable(source_filename_hook):
-    #     print( style_cfg["generator_source_filename_hook"], "is not callable" )
-    #     sys.exit()
-    # if not callable(module_name_hook):
-    #     print( style_cfg["generator_module_name_hook"], "is not callable" )
-    #     sys.exit()
+    # # Look at the callback configs to determine if we have valid, callable functions
 
-    # header_filename_hook()
-    # source_filename_hook()
-    # module_name_hook()
+    # Print all configs to sanity check what we receive here
+    # for section in configs.keys():
+        # print(section)
+        # for x in configs[section].keys():
+            # print('    ', x, ':', configs[section][x])
+
+    # We should not be directly using configs here... I think we should just
+    # pass the configs to a file_def generator object which does all the validation checking
+    # And generation or filepath preview strings
+    # And then we should pass those file gen objects to a module generator object
+    # Which should run the file generators
+
+    hook_source = os.path.splitext( os.path.normpath( configs[configs["GLOBAL"]["default_module_def"]]["mod_callbacks"] ) )[0]
+    print( hook_source )
+
+    _hooks = __import__( hook_source, globals(), locals(), [], 0 )
+
+    # Call the name callbacks to preview the full file path using
+    # the configs[path_in_module] + '/' + configs[name_callback]
 
     from source_generator      import print_source, gen_path_src
     from header_generator      import print_header, gen_path_header
@@ -202,46 +206,58 @@ def handle_generate( args, configs ):
     module_dir = args.module.lstrip("/")
     # print( module_dir )
 
-    # If user passed in specifc generattor flags, handle those only
+    # If user passed in specifc generator flags, handle those only
     # print( args.types )
     if args.types is not None:
         types = get_generators( args.types )
     else:
-        # Set flags that generate a module
-        types = [ "source", "header", "test_source", "makefile" ]
+        # Set flags that generate a module, according to the module definition
+        # specified by "default_module_def"
+        types = [ key for key in list(configs[configs["GLOBAL"]["default_module_def"]].keys()) if key in list(configs["FILE_GENERATORS"].keys()) ]
+    print('')
 
-    print('')
-    if "source" in types:
-        print( gen_path_src( module_dir, configs ) )
-    if "header" in types:
-        print( gen_path_header( module_dir, configs ) )
-    if "test_source" in types:
-        print( gen_path_test_source( module_dir, configs ) )
-    if "makefile" in types:
-        print( gen_path_makefile( module_dir, configs ) )
-    if "script" in types:
-        print( gen_path_test_script( module_dir, configs ) )
-    print('')
+    # Get the file generators dict
+    file_generators = configs["FILE_GENERATORS"]
+
+    print(types)
+
+    # List the FILE DEFs we will use - show user a preview of what will be made
+    for key in file_generators.keys():
+        if key in types:
+            print("Would make a", key, "by using", file_generators[key], "FILE GENERATOR" )
+            file_def_section = file_generators[key]
+
+            name_cb = configs[file_def_section]["name_callback"]
+            # attrs = dir(name_cb)
+            # print(hasattr( name_cb, '__callable__' ))
+            if name_cb:
+                print("name callback found")
+                if hasattr( _hooks, name_cb ):
+                    print("obj found")
+                    name_hook = getattr( _hooks, name_cb )
+                    if callable(name_hook):
+                        print( "callable!" )
+                else:
+                    print("obj not found")
+            else:
+                print("Not in config")
+            # print_cb = configs[file_def_section]["generate_callback"]
+            # if hasattr( _hooks, print_cb ):
+                # printer_hook = getattr( _hooks, print_cb )
+
+            # print( callable(name_hook) )
+            # print( callable(printer_hook) )
+
 
     # print( types )
+    print('')
     answer = input("Generate? Y/n: ")
 
     if answer != 'n':
-        if "source" in types:
-            print_source( module_dir, configs )
-        if "header" in types:
-            print_header( module_dir, configs )
-        if "test_source" in types:
-            print_test_source( module_dir, configs )
-        if "makefile" in types:
-            print_makefile( module_dir, configs )
-        if "script" in types:
-            print_test_script( module_dir, configs )
-
+        pass
     else:
         print("canceled")
         sys.exit()
-
     # print( args )
 
 
@@ -353,6 +369,10 @@ class CmodCommand:
         parser = argparse.ArgumentParser( description=self.description, usage=self.usage )
         if self.arg_types is not None:
             [parser.add_argument( *arg[0], **arg[1] ) for arg in self.arg_types]
+
+            # Consider passing the parser over tot he handler, so each command
+            # can optionally add runtime-generated arguments - like clean's
+            # ability to ID files to clean with flags generated from the config
             self.arg_namespace = parser.parse_args( args )
 
     # This where configs and arguments are passed to Cmod commands
