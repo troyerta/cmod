@@ -2,6 +2,23 @@ import sys
 import os
 import re
 import datetime
+import fnmatch
+
+def find_files( dir='.', glob=r'.*' ):
+    matches = list()
+
+    for file in os.listdir( dir ):
+        if fnmatch.fnmatch(file, glob):
+            matches.append( file )
+    # print(glob)
+    # print(os.listdir( dir ))
+    # print(matches)
+    # sys.exit()
+
+    if matches:
+        return [os.path.join( dir, match ) for match in matches ]
+    else:
+        return list()
 
 def find_module_dir( module, marker_type, marker_name ):
     matches = list()

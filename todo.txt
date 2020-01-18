@@ -40,25 +40,44 @@ Tests:
                     To build/run only the specified suite to the runner
             - should this be a cmod list feature?
 
-List all modules under the specified parent module
-cmod list --m=module
+Config and Makefile Changes:
 
-List all modules with their test suites/groups under the specified parent module
-cmod list --m=module --suites
+[==========] - Set Task queue to run tests if > 20 modules are found
+[==========] - Set default verbosity to 4
+[==========] - Add file search glob to FILE DEFS
+[==========] - Create 2 util functions that find file/files using that glob
+               - Best to just always return a list of matches, and handle lists instead of expecting only 1 match
+[          ] - Rewrite the way module makefiles are printed with SRC_DIR lists
+[          ] - Re-generate the module Makefile for any test module
+[          ] - Add new global makefile
+[==========] - Convert Module and Clean classes to use the globber, instead of regex
+[          ] - Integrate test_config 3 and 4 with config.ini
+[          ] - Set const key values - no more string literals
+[          ] - Make getters for config dict to simplify fetching values
+[          ] - Enforce the "one-tag per file def" requirement
+[          ] - Move global makefile and test harnesses to cmod dir
+[          ] - Rename and clean-out files in cmod-lib
 
-Now, we should be able to run this
-cmod test --m=module --suites=?
+- Add test harness to config.ini
+- See test_config4.ini
+This also makes the case that each file def
+needs to have a universal string associated with
+it, so it can be referred to as a generation flag, a cleaning flag, used to tell which files the makefile should compile, which headers/directories to include, etc.
+In the same way, we should be able to use the config file to point to our test harness files, but specifying the regexes for finding the tests and groups is still not very... configurable.... rats.
+This also makes the case that cmod should write the module makefile in a more general way:
+SRC_DIRS = . unit_testing/tests unit_testing/runners
 
-which is the same as
-cmod list --m=module --suites
+New Module Makefile:
+- See new_mk.mk
 
-Which will list the suites in that module
-
-Now we can go and run just that specified suite:
-cmod test --module=HWM --suite=TEST_HWM_SUITE
-
-Or possibly even
-cmod test --module=HWM --suite=TEST_HWM_SUITE --test=TestNumbersDontExplode
+List:
+[          ] - Make a verbose flag option for "list" command, which can print out a summary of all the files that cmod finds in a module given the current config regexes
+[          ] - List all modules under the specified parent module via cmod list --m=module
+[          ] - List all modules with their test suites/groups under the specified parent module via cmod list --m=module --suites
+  - Now, we should be able to run this via "cmod test --m=module --suites=?" which is the same as "cmod list --m=module --suites" Which will list the suites in that module
+  - Now we can go and run just that specified suite: cmod test --module=HWM --suite=TEST_HWM_SUITE
+    Or possibly even
+    cmod test --module=HWM --suite=TEST_HWM_SUITE --test=TestNumbersDontExplode
 
 Makefile:
 [          ] - Add an production code "header_dir" option to the config, and add to Makefile include flags

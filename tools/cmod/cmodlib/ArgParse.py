@@ -289,7 +289,7 @@ def handle_test( args, configs ):
     from Module import do_test_cycle
     wksp = Workspace( args, configs=configs )
 
-    if wksp.num_modules > 11:
+    if wksp.num_modules > 20:
         from Module import do_test_cycle
         # Start a parallel process queue
         start = time.time()
@@ -307,10 +307,10 @@ def handle_test( args, configs ):
         wksp.print_test_summary()
         print(f'Time taken = {time.time() - start:.10f}')
 
-def handle_clean( args, global_cfg, mod_cfg ):
+def handle_clean( args, configs ):
     from Clean import Cleaner
-    cleaner = Cleaner( args, mod_cfg )
-    cleaner.find_files()
+    cleaner = Cleaner( args, configs )
+    cleaner.build_file_list()
     cleaner.do_cleaning()
 
 action_handlers = [ \

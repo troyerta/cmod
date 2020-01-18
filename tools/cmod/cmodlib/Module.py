@@ -4,6 +4,7 @@ import re
 import subprocess
 
 from Unity import TestSrc, TestResult, UnityOutput, TestSummary
+from Utils import find_files
 
 def do_test_cycle( module ):
     module.find_test_src_files()
@@ -22,7 +23,6 @@ class Module:
         self.test_src_paths = list()  # list of paths
         self.test_groups = list()
         self.test_runner_path = None
-        self.test_output_filepath = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["results_dir"], self.config["DEFAULT_MODULE_STRUCTURE"]["results_txt_prefix"] + self.name.lower() + self.config["DEFAULT_MODULE_STRUCTURE"]["results_txt_suffix"] + ".txt" )
 
         # Use default if not passed in
         if verbosity is None:
@@ -38,23 +38,13 @@ class Module:
         return str( self.path )
 
     def find_test_src_files( self ):
-        find_test_src_regex = r'(?i)' + self.config["DEFAULT_MODULE_STRUCTURE"]["test_src_prefix"] + r'.*' + self.config["DEFAULT_MODULE_STRUCTURE"]["test_src_suffix"] + r'.c'
-        test_dir_path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["test_dir"] )
-        if os.path.isdir( test_dir_path ):
-            files_and_dirs = os.listdir( test_dir_path )
-            # print( files_and_dirs )
-        else:
-            return
-        test_srcs = list()
+        find_test_src_glob = self.config["FILE_DEF_TEST_SOURCE"]["glob"]
+        test_dir_path = os.path.join( self.path, self.config["FILE_DEF_TEST_SOURCE"]["path"] )
+        test_srcs = find_files( test_dir_path, find_test_src_glob )
 
-        for each in files_and_dirs:
-            match = re.findall(find_test_src_regex, each)
-            if match:
-                test_srcs.append(match[0])
         for file in test_srcs:
-            path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["test_dir"], file )
-            self.test_src_paths.append( path )
-            self.test_sources.append( TestSrc( path ) )
+            self.test_src_paths.append( file )
+            self.test_sources.append( TestSrc( file ) )
         self.test_src_paths.sort()
 
     # Make sure this uses the test harness = UNITY config
@@ -102,7 +92,16 @@ class Module:
         p1.wait()
 
     def get_test_results( self ):
-        test_output = UnityOutput( self.test_output_filepath )
+        # test_output = UnityOutput( self.test_output_filepath )
+        result_files = find_files( os.path.join( self.path, self.config["FILE_DEF_TEST_RESULT"]["path"] ), self.config["FILE_DEF_TEST_RESULT"]["glob"] )
+
+        if len( result_files ) == 0:
+            print("More than one result files found:", result_files )
+            sys.exit()
+        if len( result_files ) > 1:
+            print("More than one result files found:", result_files )
+            sys.exit()
+        test_output = UnityOutput( result_files[0] )
         self.test_output_list, self.test_result_summary = test_output.read_test_output()
 
         # Make an ordered list of test result objects

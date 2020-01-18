@@ -3,7 +3,7 @@ import sys
 import re
 import argparse
 
-from Utils import find_modules
+from Utils import find_modules, find_files
 
 warning = "config.ini contains some duplicate settings between filetypes.\n \
     This prevents the cleaner from distinguishing between source files.\n \
@@ -11,13 +11,10 @@ warning = "config.ini contains some duplicate settings between filetypes.\n \
             settings to enable the cleaner to work properly."
 
 class Cleaner:
-    def __init__( self, args, mod_configs ):
+    def __init__( self, args, configs ):
         self.args = args
         self.modules = None
-        self.configs = mod_configs
-
-        if not self.files_are_distinguishable():
-            print( warning )
+        self.configs = configs
 
         self.file_clean_list = list()
 
@@ -116,46 +113,29 @@ class Cleaner:
         else:
             print( "\nnothing to clean" )
 
-    def find_files_types( self, dir='.', prefix='', suffix='', extension='' ):
+    def find_in_each_module( self, dir='.', glob='*' ):
         matches = list()
-        pattern = prefix + ".*" + suffix + extension
-        # print(pattern)
-
+        # print(glob)
         for module_path in self.modules:
-            for root, dirs, files in os.walk( os.path.join( module_path, dir ) ):
-                # print(root,dirs,files)
-                [matches.append( os.path.join(root, fi) ) for fi in filter(lambda x: re.match(pattern, x), files)]
+            matches.extend( find_files( os.path.join( module_path, dir ), glob ) )
         # print(matches)
         return matches
 
     def find_runners( self ):
         runners = list()
-        runners = self.find_files_types( self.configs["runner_dir"], \
-                                            self.configs["runner_src_prefix"], \
-                                            self.configs["runner_src_suffix"], \
-                                            ".c", \
-                                        )
+        runners = self.find_in_each_module( self.configs["FILE_DEF_TEST_RUNNER"]["path"], self.configs["FILE_DEF_TEST_RUNNER"]["glob"] )
         # print(runners)
         return runners
 
     def find_builds( self ):
         builds = list()
-        # For linux builds only
-        builds = self.find_files_types( self.configs["exe_dir"], \
-                                            ".", \
-                                            ".", \
-                                            ".out", \
-                                        )
+        builds = self.find_in_each_module( self.configs["FILE_DEF_TEST_BUILD"]["path"], self.configs["FILE_DEF_TEST_BUILD"]["glob"] )
         # print(builds)
         return builds
 
     def find_results( self ):
         results = list()
-        results = self.find_files_types( self.configs["results_dir"], \
-                                            self.configs["results_txt_prefix"], \
-                                            self.configs["results_txt_suffix"], \
-                                            ".txt", \
-                                        )
+        results = self.find_in_each_module( self.configs["FILE_DEF_TEST_RESULT"]["path"], self.configs["FILE_DEF_TEST_RESULT"]["glob"] )
         # print(results)
         return results
 
@@ -172,7 +152,7 @@ class Cleaner:
         # print(scripts)
         return scripts
 
-    def find_files( self ):
+    def build_file_list( self ):
         temp_list = list()
 
         if self.modules is None:
@@ -190,26 +170,8 @@ class Cleaner:
             results = self.find_results()
             [temp_list.append( result ) for result in results if results is not None]
         if self.all_flag or self.scripts_flag:
-            scripts = self.find_scripts( self.configs["test_script_name"] )
+            scripts = self.find_scripts( self.configs["FILE_DEF_TEST_SCRIPT"]["glob"] )
             [temp_list.append( script ) for script in scripts if scripts is not None]
 
         self.file_clean_list = sorted( temp_list )
-
-    def files_are_distinguishable( self ):
-        result = True
-        if self.configs["runner_dir"] == self.configs["test_dir"] \
-            and self.configs["runner_src_prefix"] == self.configs["test_src_prefix"] \
-            and self.configs["runner_src_suffix"] == self.configs["test_src_suffix"]:
-            result = False
-
-        if self.configs["runner_dir"] == self.configs["results_dir"] \
-            and self.configs["runner_src_prefix"] == self.configs["results_txt_prefix"] \
-            and self.configs["runner_src_suffix"] == self.configs["results_txt_suffix"]:
-            result = False
-
-        if self.configs["test_dir"] == self.configs["results_dir"] \
-            and self.configs["test_src_prefix"] == self.configs["results_txt_prefix"] \
-            and self.configs["test_src_suffix"] == self.configs["results_txt_suffix"]:
-            result = False
-
-        return result
+        # print(self.file_clean_list)

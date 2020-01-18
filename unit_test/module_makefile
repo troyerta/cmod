@@ -43,41 +43,37 @@ CFLAGS += -Wundef
 
 # Use some default settings for these variables only if they are not defined
 # already by a module's Makefile
-PROJ_ROOT ?= ../
-SRC_DIR ?= .
 UNITY_DIR ?= $(PROJ_ROOT)unit_test/unity
 FFF_DIR ?= $(PROJ_ROOT)unit_test/fff
-UTEST_DIR ?= unit_testing
-TESTS_DIR ?= $(UTEST_DIR)/tests
-EXE_DIR ?= $(UTEST_DIR)/exe
-RUNNER_DIR ?= $(UTEST_DIR)/runners
-RESULTS_DIR ?= $(UTEST_DIR)/results
-
-# Make some mutually-unique lists of our modules sources
-# Only files that following the naming convention specified in
-# config.ini will be added to these lists
-CUT_SRC = $(wildcard $(SRC_DIR)/*.c)
-UNITY_SRC = $(wildcard $(UNITY_DIR)/*.c)
-TEST_SRC = $(wildcard $(TESTS_DIR)/$(TEST_SRC_PREFIX)*$(TEST_SRC_SUFFIX).c)
-RUNNER_SRC = $(wildcard $(RUNNER_DIR)/$(RUNNER_SRC_PREFIX)*$(RUNNER_SRC_SUFFIX).c)
 
 # The executable's file name is generated from the runner source's name
-EXECUTABLE = $(patsubst $(RUNNER_DIR)/$(RUNNER_SRC_PREFIX)%$(RUNNER_SRC_SUFFIX).c,$(EXE_DIR)/%$(TARGET_EXTENSION),$(RUNNER_SRC))
+EXECUTABLE = $(EXE_DIR)/test_$(notdir $(MODULE_DIR))$(TARGET_EXTENSION)
 
 # The result's file name is generated from the runner source's name
-RESULTS = $(patsubst $(RUNNER_DIR)/$(RUNNER_SRC_PREFIX)%$(RUNNER_SRC_SUFFIX).c,$(RESULTS_DIR)/$(RESULTS_TXT_PREFIX)%$(RESULTS_TXT_SUFFIX).txt,$(RUNNER_SRC))
+RESULTS = $(RESULTS_DIR)/$(RESULTS_TXT_PREFIX)$(notdir $(MODULE_DIR))$(RESULTS_TXT_SUFFIX).txt
+
+# Move this list to the module makefile
+SRC_DIRS = $(SRC_DIR) $(TESTS_DIR) $(RUNNER_DIR)
+SRC_DIRS += $(UNITY_DIR)
 
 # Complete list of all source files to be compiled for the build
-SRC_FILES = $(CUT_SRC) $(UNITY_SRC) $(TEST_SRC) $(RUNNER_SRC)
+# _SRC_FILES := $(foreach regex, $(REGEXS) \
+#	$(foreach dir,$(SRC_DIRS), \
+#		$(wildcard $(dir)/$(regex) ) )
+# SRC_FILES = $(sort $(_SRC_FILES))
+
+SRC_FILES := $(sort $(foreach dir,$(SRC_DIRS),$(wildcard $(dir)/*.c) ) )
 
 # All places to look for headers
+# INC_DIRS = $(addprefix -I, $(HDR_DIRS))
 INC_DIRS=-I. -I$(UNITY_DIR) -I$(FFF_DIR)
 
 # List of all headers so we can track their existence as dependencies
+# INC_FILES := $(sort $(foreach dir,$(HDR_DIRS),$(wildcard $(dir)/*.h) ) )
 INC_FILES=\
-  $(wildcard $(UNITY_DIR)/%.h) \
-  $(wildcard $(FFF_DIR)/%.h) \
-  $(wildcard %.h)
+	$(wildcard $(UNITY_DIR)/*.h) \
+	$(wildcard $(FFF_DIR)/*.h) \
+	$(wildcard *.h)
 
 # Special #defines desired for the build
 SYMBOLS=
@@ -98,7 +94,11 @@ $(RESULTS): $(EXECUTABLE)
 # Compile and link our tet program together using all our resources
 # Test suite source and test runner must exist by this time, or the build will fail
 $(EXECUTABLE): $(SRC_FILES) $(INC_FILES)
-	@$(C_COMPILER) $(CFLAGS) $(INC_DIRS) $(SYMBOLS) $(sort $(SRC_FILES)) -o $(EXECUTABLE)
+	@echo $@
+	@echo $(SRC_DIRS)
+	@echo $(SRC_FILES)
+	@echo $(INC_FILES)
+	@$(C_COMPILER) $(CFLAGS) $(INC_DIRS) $(SYMBOLS) $(SRC_FILES) -o $(EXECUTABLE)
 
 # Rules to make any module directories that hold generated files
 $(EXE_DIR):
