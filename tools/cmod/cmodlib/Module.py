@@ -26,7 +26,7 @@ class Module:
 
         # Use default if not passed in
         if verbosity is None:
-            self.verbosity = int(self.config["DEFAULT_MODULE_STRUCTURE"]["default_verbosity"])
+            self.verbosity = int(self.config["GLOBAL"]["default_test_verbosity"])
         else:
             self.verbosity = verbosity
 
@@ -38,9 +38,7 @@ class Module:
         return str( self.path )
 
     def find_test_src_files( self ):
-        find_test_src_glob = self.config["FILE_DEF_TEST_SOURCE"]["glob"]
-        test_dir_path = os.path.join( self.path, self.config["FILE_DEF_TEST_SOURCE"]["path"] )
-        test_srcs = find_files( test_dir_path, find_test_src_glob )
+        test_srcs = find_files( os.path.join( self.path, self.config["FILE_DEF_TEST_SOURCE"]["path"] ), self.config["FILE_DEF_TEST_SOURCE"]["glob"] )
 
         for file in test_srcs:
             self.test_src_paths.append( file )
@@ -55,12 +53,15 @@ class Module:
         self.test_groups = [group for src in self.test_sources for group in src.TestGroups ]
         # [print(group.name) for group in self.test_groups]
 
+    # This should grab a generator class and look for file defs in the "runner" category
     def gen_test_runner( self ):
+        # CALLBACK
         # For each test group object, make a call to it's runner in a new file
         basename = os.path.splitext( os.path.basename( self.path ))
-        test_runner_basename = self.config["DEFAULT_MODULE_STRUCTURE"]["runner_src_prefix"] + basename[0].lower() + self.config["DEFAULT_MODULE_STRUCTURE"]["runner_src_suffix"] +'.c'
-        self.test_runner_path = os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["runner_dir"], test_runner_basename )
-        os.makedirs( os.path.join( self.path, self.config["DEFAULT_MODULE_STRUCTURE"]["runner_dir"]), exist_ok=True )
+        # test_runner_basename = self.config["FILE_DEF_TEST_RUNNER"]["path"]
+        test_runner_basename = self.config["FILE_DEF_TEST_RUNNER"]["prefix"] + basename[0].lower() + self.config["FILE_DEF_TEST_RUNNER"]["suffix"] +'.c'
+        self.test_runner_path = os.path.join( self.path, self.config["FILE_DEF_TEST_RUNNER"]["path"], test_runner_basename )
+        os.makedirs( os.path.join( self.path, self.config["FILE_DEF_TEST_RUNNER"]["path"]), exist_ok=True )
         # print( 'test_runner_path =', self.test_runner_path)
 
         with open(self.test_runner_path, "w+") as f:
@@ -92,7 +93,6 @@ class Module:
         p1.wait()
 
     def get_test_results( self ):
-        # test_output = UnityOutput( self.test_output_filepath )
         result_files = find_files( os.path.join( self.path, self.config["FILE_DEF_TEST_RESULT"]["path"] ), self.config["FILE_DEF_TEST_RESULT"]["glob"] )
 
         if len( result_files ) == 0:

@@ -6,7 +6,7 @@ sys.path.insert(1, '../')
 from Utils import splitpath
 
 def gen_path_test_script( module_dir, configs ):
-    return os.path.join( module_dir, configs["DEFAULT_MODULE_STRUCTURE"]["test_script_name"] )
+    return os.path.join( module_dir, configs["FILE_DEF_TEST_SCRIPT"]["glob"] )
 
 # def print_tdd_script( file_path, depth, module_config_tag ):
 def print_test_script( module_dir, configs ):

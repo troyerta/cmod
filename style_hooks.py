@@ -22,10 +22,21 @@ def print_header( module_dir, configs ):
 # test_src
 
 def print_test_source( module_dir, configs ):
-    print("Printing header")
+    print("Printing test source")
+
+def gen_test_source_name( module_dir, configs ):
+    pass
 
 # runner
 
+def gen_test_runner_name( module_dir, configs ):
+    print("Gen runner name")
+    basename = os.path.splitext( os.path.basename( module_dir ))
+    test_runner_basename = configs["FILE_DEF_TEST_RUNNER"]["prefix"] + basename[0].lower() + self.config["FILE_DEF_TEST_RUNNER"]["suffix"] +'.c'
+    return test_runner_basename
+
+def print_test_runner( module_dir, configs ):
+    print("Printing test runner")
 
 # makefile
 

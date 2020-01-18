@@ -17,7 +17,7 @@ def gen_basename_hdr( path ):
 
 def gen_path_header( module_dir, configs ):
     norm_dir = os.path.normpath( module_dir )
-    return os.path.normpath( os.path.join( norm_dir, configs["DEFAULT_MODULE_STRUCTURE"]["src_dir"], gen_basename_hdr( norm_dir ) ) )
+    return os.path.normpath( os.path.join( norm_dir, configs["FILE_DEF_HEADER"]["path"], gen_basename_hdr( norm_dir ) ) )
 
 def print_section_header( file, name ):
     file.write('/**********************************************************\n')

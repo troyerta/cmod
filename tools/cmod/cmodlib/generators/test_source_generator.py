@@ -13,7 +13,7 @@ def gen_basename_test_src( path ):
 
 def gen_path_test_source( module_dir, configs ):
     norm_dir = os.path.normpath( module_dir )
-    return os.path.normpath( os.path.join( norm_dir, configs["DEFAULT_MODULE_STRUCTURE"]["test_dir"], gen_basename_test_src( norm_dir ) ) )
+    return os.path.normpath( os.path.join( norm_dir, configs["FILE_DEF_TEST_SOURCE"]["path"], gen_basename_test_src( norm_dir ) ) )
 
 def print_section_header( file, name ):
     file.write('/**********************************************************\n')

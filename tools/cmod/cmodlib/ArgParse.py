@@ -98,7 +98,6 @@ arg_help_scripts   = "How to use the --scripts flag"
 module_arg    = (('--module', '-module', '--m', '-m'),   {'dest':'module',    'help':arg_help_module,    'type':str,          })
 mod_arg_reqd  = (('--module', '-module', '--m', '-m'),   {'dest':'module',    'help':arg_help_module,    'type':str, 'required':True })
 verbosity_arg = (('--v', '-v'),                          {'dest':'verbosity', 'help':arg_help_verbosity, 'type':str,          })
-types_arg     = (('--types', '-types', '--t', '-t'),     {'dest':'types',     'help':arg_help_types,     'type':str,          })
 recurse_flag  = (('--r', '-r'),                          {'dest':'recurse',   'help':arg_help_recurse,   'action':'store_true'})
 dry_run_flag  = (('--dry', '-dry', '--d', '-d'),         {'dest':'dry',       'help':arg_help_dry_run,   'action':'store_true'})
 runners_flag  = (('--runners', '-runners'),              {'dest':'runners',   'help':arg_help_runners,   'action':'store_true'})
@@ -113,8 +112,7 @@ scripts_flag  = (('--scripts', '-scripts'),              {'dest':'scripts',   'h
 
 # Set the parameters used by cmod commands
 generate_args = [ \
-    mod_arg_reqd, \
-    types_arg \
+    mod_arg_reqd
     ]
 
 workspace_args = [ \
@@ -129,7 +127,7 @@ tree_args = [ \
     tests_flag \
     ]
 
-cleaner_args = [ \
+clean_args = [ \
     module_arg, \
     recurse_flag, \
     dry_run_flag, \
@@ -145,7 +143,7 @@ cleaner_args = [ \
 cmd_arg_types = [ \
     None, \
     generate_args, \
-    cleaner_args, \
+    clean_args, \
     workspace_args, \
     tree_args, \
     workspace_args \
@@ -154,33 +152,30 @@ cmd_arg_types = [ \
 def handle_help( args, configs ):
     print("handling help")
 
-def get_generators( types ):
-    gen_flags = list()
-    if "c" in types:
-        gen_flags.append( "source" )
-    if "h" in types:
-        gen_flags.append( "header" )
-    if "t" in types:
-        gen_flags.append( "test_source" )
-    if "m" in types:
-        gen_flags.append( "makefile" )
-    if "s" in types:
-        gen_flags.append( "script" )
-    return gen_flags
-
-def handle_generate( args, configs ):
+def handle_generate( args_in, configs ):
     # From FileDef import FileDef
     # From Generator import Generator
 
+    # module_structure = configs["GLOBAL"]["default_module_def"]
+    # file_generator_header = configs[ module_structure ]["file_generator_list_reference"]
+    file_generator_dict = configs["CMOD_FILE_GENERATORS"]
+    mod_generator_d = configs["CMOD_MODULE_GENERATOR"]
+    file_generator_dict.update( mod_generator_d )
+
+    parser = argparse.ArgumentParser( description=cmd_description_generate, usage=cmd_usage_generate )
+    if generate_args is not None:
+        [parser.add_argument( *arg[0], **arg[1] ) for arg in generate_args]
+    # Add each generator key as a stored arg flag
+    [parser.add_argument( '--'+key, dest=key, action='store_true' ) for key in file_generator_dict.keys()]
+    args = parser.parse_args( args_in )
+    my_args_dict = vars(args)
+    module = my_args_dict.pop("module", '.')
+    # print(my_args_dict)
+    types = [ fileflag for fileflag in my_args_dict.keys() if my_args_dict[fileflag] == True ]
+    # print(types)
+
     # try_to_import_hooks_module
-
     # # Look at the callback configs to determine if we have valid, callable functions
-
-    # Print all configs to sanity check what we receive here
-    # for section in configs.keys():
-        # print(section)
-        # for x in configs[section].keys():
-            # print('    ', x, ':', configs[section][x])
 
     # We should not be directly using configs here... I think we should just
     # pass the configs to a file_def generator object which does all the validation checking
@@ -188,40 +183,67 @@ def handle_generate( args, configs ):
     # And then we should pass those file gen objects to a module generator object
     # Which should run the file generators
 
-    hook_source = os.path.splitext( os.path.normpath( configs[configs["GLOBAL"]["default_module_def"]]["mod_callbacks"] ) )[0]
-    print( hook_source )
+    # TODO: Handle the case where the source is specified in the config without the file extension
+    hook_source = os.path.splitext( os.path.normpath( configs[configs["GLOBAL"]["default_module_def"]]["file_gen_callbacks"] ) )[0]
+    # print( hook_source )
 
     _hooks = __import__( hook_source, globals(), locals(), [], 0 )
 
     # Call the name callbacks to preview the full file path using
     # the configs[path_in_module] + '/' + configs[name_callback]
 
-    from source_generator      import print_source, gen_path_src
-    from header_generator      import print_header, gen_path_header
-    from test_source_generator import print_test_source, gen_path_test_source
-    from test_script_generator import print_test_script, gen_path_test_script
-    from makefile_generator    import print_makefile, gen_path_makefile
-
     # Make sure raw path arg string has no leading slash
-    module_dir = args.module.lstrip("/")
+    module_dir = module.lstrip("/")
     # print( module_dir )
-
-    # If user passed in specifc generator flags, handle those only
-    # print( args.types )
-    if args.types is not None:
-        types = get_generators( args.types )
-    else:
-        # Set flags that generate a module, according to the module definition
-        # specified by "default_module_def"
-        types = [ key for key in list(configs[configs["GLOBAL"]["default_module_def"]].keys()) if key in list(configs["FILE_GENERATORS"].keys()) ]
-    print('')
-
-    # Get the file generators dict
-    file_generators = configs["FILE_GENERATORS"]
 
     print(types)
 
+    # mod_generator_header = configs[ module_structure ]["file_generator_list_reference"]
+    # mod_generator_dict = configs[mod_generator_header]
+
+    # If user passed in specifc generator flags, handle those only
+    # print( args.types )
+    # Here, a number of flags were passed in - but not under
+    # the types arg - there were simple called out with --makefile --script --source
+
+
+
+    if len(types) == 0:
+        # We will be asked to generate everything in CMOD_MODULE_GENERATOR
+        module_def = configs["GLOBAL"]["default_module_def"]
+        file_gen_ref = configs[module_def]["file_generator_list_reference"]
+        module_dict = configs["CMOD_MODULE_GENERATOR"]
+        for key in module_dict.keys():
+            types.append(key)
+        # print(module_dict)
+        print("Make pre-defined module!")
+    else:
+        # We might be asked to generate anything from CMOD_FILE_GENERATORS or CMOD_MODULE_GENERATOR
+
+        # Grab both file-def dictionaries and merge them into a super dict
+        # module_def = configs["GLOBAL"]["default_module_def"]
+        # file_gen_ref = configs[module_def]["file_generator_list_reference"]
+        # module_dict = configs[file_gen_ref]
+        # file_dict = configs["CMOD_FILE_GENERATORS"]
+        # module_dict.update(file_dict)
+        # print(module_dict)
+        # Now types contains all the keys we will need to access the callbacks
+        print("Make specific files!")
+
+    # print(module_structure)
+    # print(mod_generator_dict)
+    print(types)
+    print('')
+    sys.exit()
+
+    # Get the file generators dict
+    file_generators = configs[mod_generator_dict]
+
+    # Add the FILE_GENERATORS as well?
+    # file_generators.update(configs["CMOD_FILE_GENERATORS"])
+
     # List the FILE DEFs we will use - show user a preview of what will be made
+    # print(file_generators.keys())
     for key in file_generators.keys():
         if key in types:
             print("Would make a", key, "by using", file_generators[key], "FILE GENERATOR" )
@@ -231,16 +253,17 @@ def handle_generate( args, configs ):
             # attrs = dir(name_cb)
             # print(hasattr( name_cb, '__callable__' ))
             if name_cb:
-                print("name callback found")
+                print("    name callback found in config:", name_cb)
                 if hasattr( _hooks, name_cb ):
-                    print("obj found")
+                    print("        attr found in callback source")
                     name_hook = getattr( _hooks, name_cb )
                     if callable(name_hook):
-                        print( "callable!" )
+                        print( "            ", name_cb, "is callable!" )
                 else:
-                    print("obj not found")
+                    print("        attr", name_cb, "not found in", hook_source )
             else:
-                print("Not in config")
+                print("    No callback in config")
+            print('')
             # print_cb = configs[file_def_section]["generate_callback"]
             # if hasattr( _hooks, print_cb ):
                 # printer_hook = getattr( _hooks, print_cb )
@@ -263,12 +286,24 @@ def handle_generate( args, configs ):
 
 def handle_list( args, configs ):
     from Workspace import Workspace
-    wksp = Workspace( args=args, configs=configs )
+
+    parser = argparse.ArgumentParser( description=cmd_description_list, usage=cmd_usage_list )
+    if workspace_args is not None:
+        [parser.add_argument( *arg[0], **arg[1] ) for arg in workspace_args]
+    my_args = parser.parse_args( args )
+
+    wksp = Workspace( args=my_args, configs=configs )
     wksp.print_module_names()
 
 def handle_tree( args, configs ):
     from Tree import tree
-    tree( args )
+
+    parser = argparse.ArgumentParser( description=cmd_description_tree, usage=cmd_usage_tree )
+    if tree_args is not None:
+        [parser.add_argument( *arg[0], **arg[1] ) for arg in tree_args]
+    my_args = parser.parse_args( args )
+
+    tree( my_args )
 
 def handle_report( args, configs ):
     print("handling report\n")
@@ -287,7 +322,13 @@ def handle_analyze( args, configs ):
 def handle_test( args, configs ):
     from Workspace import Workspace
     from Module import do_test_cycle
-    wksp = Workspace( args, configs=configs )
+
+    parser = argparse.ArgumentParser( description=cmd_description_test, usage=cmd_usage_test )
+    if workspace_args is not None:
+        [parser.add_argument( *arg[0], **arg[1] ) for arg in workspace_args]
+    my_args = parser.parse_args( args )
+
+    wksp = Workspace( my_args, configs=configs )
 
     if wksp.num_modules > 20:
         from Module import do_test_cycle
@@ -309,7 +350,13 @@ def handle_test( args, configs ):
 
 def handle_clean( args, configs ):
     from Clean import Cleaner
-    cleaner = Cleaner( args, configs )
+
+    parser = argparse.ArgumentParser( description=cmd_description_clean, usage=cmd_usage_clean )
+    if clean_args is not None:
+        [parser.add_argument( *arg[0], **arg[1] ) for arg in clean_args]
+    my_args = parser.parse_args( args )
+
+    cleaner = Cleaner( my_args, configs )
     cleaner.build_file_list()
     cleaner.do_cleaning()
 
@@ -362,22 +409,22 @@ class CmodCommand:
         self.description = cmd_descriptions_dict[cmd]
         self.usage = cmd_usage_msg_dict[cmd]
         self.help_msg = cmd_help_msg_dict[cmd]
-        self.arg_namespace = None
+        self.parser = None
 
     # Produce a namespace variable with the argparser, given the passed-in arguments
-    def get_arg_namespace( self, args ):
-        parser = argparse.ArgumentParser( description=self.description, usage=self.usage )
-        if self.arg_types is not None:
-            [parser.add_argument( *arg[0], **arg[1] ) for arg in self.arg_types]
+    # def get_arg_namespace( self, args ):
+        # parser = argparse.ArgumentParser( description=self.description, usage=self.usage )
+        # if self.arg_types is not None:
+            # [parser.add_argument( *arg[0], **arg[1] ) for arg in self.arg_types]
 
-            # Consider passing the parser over tot he handler, so each command
+            # Consider passing the parser over to the handler, so each command
             # can optionally add runtime-generated arguments - like clean's
             # ability to ID files to clean with flags generated from the config
-            self.arg_namespace = parser.parse_args( args )
+            # self.arg_namespace = parser.parse_args( args )
 
     # This where configs and arguments are passed to Cmod commands
-    def run( self, configs ):
-        self.handler( self.arg_namespace, configs )
+    def run( self, args, configs ):
+        self.handler( args, configs )
 
 # This class applies the passed arguments and configs to a cmod command, then runs it
 class ArgParser:
@@ -390,6 +437,5 @@ class ArgParser:
         cmd = get_normalized_command( self.args[0] )
         self.args.remove( self.args[0] )
         command = CmodCommand( cmd )
-        command.get_arg_namespace( self.args )
-        command.run( self.configs )
+        command.run( self.args, self.configs )
         sys.exit()

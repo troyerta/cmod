@@ -26,7 +26,7 @@ class Workspace:
     def __init__(self, args=None, configs=None, mod_cfg=None):
         self.root_dir = None
         self.configs = configs
-        self.verbosity = int(self.configs["DEFAULT_MODULE_STRUCTURE"]["default_verbosity"])
+        self.verbosity = int(self.configs["GLOBAL"]["default_test_verbosity"])
         self.module_path_list = self.get_workspace_module_paths( args )
         self.module_objs = self.get_module_objects()
 

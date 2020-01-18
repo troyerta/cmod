@@ -45,13 +45,13 @@ Config and Makefile Changes:
 [==========] - Set Task queue to run tests if > 20 modules are found
 [==========] - Set default verbosity to 4
 [==========] - Add file search glob to FILE DEFS
-[==========] - Create 2 util functions that find file/files using that glob
+[==========] - Create util function that finds files using glob
                - Best to just always return a list of matches, and handle lists instead of expecting only 1 match
 [          ] - Rewrite the way module makefiles are printed with SRC_DIR lists
-[          ] - Re-generate the module Makefile for any test module
-[          ] - Add new global makefile
+[========  ] - Re-generate the module Makefile for any existing modules
+[==========] - Add new global makefile
 [==========] - Convert Module and Clean classes to use the globber, instead of regex
-[          ] - Integrate test_config 3 and 4 with config.ini
+[=====     ] - Integrate test_config 3 and 4 with config.ini
 [          ] - Set const key values - no more string literals
 [          ] - Make getters for config dict to simplify fetching values
 [          ] - Enforce the "one-tag per file def" requirement
@@ -116,7 +116,7 @@ $ cmod export --m=dsp --r --o=../dsp
     - Each generator has a name
     - A module generator is just a list of file generators
         - The list can be specifed explicitly, or with a name group of generators that define a coding style
-    - DEFAULT_MODULE_STRUCTURE and STYLE sections should be merged, and then called out as a single "style" element in the config
+    - MODULE_DEF and STYLE sections should be merged, and then called out as a single "style" element in the config
     - Or just put all the options under "MODULE_DEF_A", so another set of options could live in "MODULE_DEF_B"
     - And we could also specify a "DEFAULT_MODULE_DEF" section to fall back on if an option is not present in "MODULE_DEF_A"
     - Remove style_config args - it's now unnecessary
