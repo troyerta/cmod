@@ -156,11 +156,7 @@ def handle_generate( args_in, configs ):
     # From FileDef import FileDef
     # From Generator import Generator
 
-    # module_structure = configs["GLOBAL"]["default_module_def"]
-    # file_generator_header = configs[ module_structure ]["file_generator_list_reference"]
     file_generator_dict = configs["CMOD_FILE_GENERATORS"]
-    mod_generator_d = configs["CMOD_MODULE_GENERATOR"]
-    file_generator_dict.update( mod_generator_d )
 
     parser = argparse.ArgumentParser( description=cmd_description_generate, usage=cmd_usage_generate )
     if generate_args is not None:
@@ -168,9 +164,16 @@ def handle_generate( args_in, configs ):
     # Add each generator key as a stored arg flag
     [parser.add_argument( '--'+key, dest=key, action='store_true' ) for key in file_generator_dict.keys()]
     args = parser.parse_args( args_in )
+
+    # Access namespace as a dictionary and remove the only non-flag arg, 'modules'
     my_args_dict = vars(args)
-    module = my_args_dict.pop("module", '.')
     # print(my_args_dict)
+    module = my_args_dict.pop("module", '.')
+    # Make sure raw path arg string has no leading slash
+    module_dir = module.lstrip("/")
+    # print( module_dir )
+
+    # Keys for generation are all the args that remain
     types = [ fileflag for fileflag in my_args_dict.keys() if my_args_dict[fileflag] == True ]
     # print(types)
 
@@ -186,91 +189,46 @@ def handle_generate( args_in, configs ):
     # TODO: Handle the case where the source is specified in the config without the file extension
     hook_source = os.path.splitext( os.path.normpath( configs[configs["GLOBAL"]["default_module_def"]]["file_gen_callbacks"] ) )[0]
     # print( hook_source )
-
     _hooks = __import__( hook_source, globals(), locals(), [], 0 )
 
-    # Call the name callbacks to preview the full file path using
-    # the configs[path_in_module] + '/' + configs[name_callback]
-
-    # Make sure raw path arg string has no leading slash
-    module_dir = module.lstrip("/")
-    # print( module_dir )
-
-    print(types)
-
-    # mod_generator_header = configs[ module_structure ]["file_generator_list_reference"]
-    # mod_generator_dict = configs[mod_generator_header]
-
-    # If user passed in specifc generator flags, handle those only
-    # print( args.types )
-    # Here, a number of flags were passed in - but not under
-    # the types arg - there were simple called out with --makefile --script --source
-
-
-
     if len(types) == 0:
-        # We will be asked to generate everything in CMOD_MODULE_GENERATOR
         module_def = configs["GLOBAL"]["default_module_def"]
-        file_gen_ref = configs[module_def]["file_generator_list_reference"]
-        module_dict = configs["CMOD_MODULE_GENERATOR"]
-        for key in module_dict.keys():
-            types.append(key)
-        # print(module_dict)
+        types = configs[module_def]["mod_def_list"].strip(' ').split(' ')
         print("Make pre-defined module!")
     else:
-        # We might be asked to generate anything from CMOD_FILE_GENERATORS or CMOD_MODULE_GENERATOR
-
-        # Grab both file-def dictionaries and merge them into a super dict
-        # module_def = configs["GLOBAL"]["default_module_def"]
-        # file_gen_ref = configs[module_def]["file_generator_list_reference"]
-        # module_dict = configs[file_gen_ref]
-        # file_dict = configs["CMOD_FILE_GENERATORS"]
-        # module_dict.update(file_dict)
-        # print(module_dict)
-        # Now types contains all the keys we will need to access the callbacks
         print("Make specific files!")
-
-    # print(module_structure)
-    # print(mod_generator_dict)
-    print(types)
+    # print(types)
     print('')
-    sys.exit()
 
-    # Get the file generators dict
-    file_generators = configs[mod_generator_dict]
-
-    # Add the FILE_GENERATORS as well?
-    # file_generators.update(configs["CMOD_FILE_GENERATORS"])
-
+    # Now we can use types to lookup section headers in this thing
     # List the FILE DEFs we will use - show user a preview of what will be made
-    # print(file_generators.keys())
-    for key in file_generators.keys():
-        if key in types:
-            print("Would make a", key, "by using", file_generators[key], "FILE GENERATOR" )
-            file_def_section = file_generators[key]
+    for key in types:
+        print("Would make a", key, "by using", file_generator_dict[key], "FILE GENERATOR" )
+        file_def_section = file_generator_dict[key]
 
-            name_cb = configs[file_def_section]["name_callback"]
-            # attrs = dir(name_cb)
-            # print(hasattr( name_cb, '__callable__' ))
-            if name_cb:
-                print("    name callback found in config:", name_cb)
-                if hasattr( _hooks, name_cb ):
-                    print("        attr found in callback source")
-                    name_hook = getattr( _hooks, name_cb )
-                    if callable(name_hook):
-                        print( "            ", name_cb, "is callable!" )
-                else:
-                    print("        attr", name_cb, "not found in", hook_source )
+        name_cb = configs[file_def_section]["name_callback"]
+        # attrs = dir(name_cb)
+        # print(hasattr( name_cb, '__callable__' ))
+        if name_cb:
+            print("    name callback found in config:", name_cb)
+            if hasattr( _hooks, name_cb ):
+                print("        attr found in callback source")
+                name_hook = getattr( _hooks, name_cb )
+                if callable(name_hook):
+                    print( "            ", name_cb, "is callable!" )
             else:
-                print("    No callback in config")
-            print('')
-            # print_cb = configs[file_def_section]["generate_callback"]
-            # if hasattr( _hooks, print_cb ):
-                # printer_hook = getattr( _hooks, print_cb )
+                print("        attr", name_cb, "not found in", hook_source )
+        else:
+            print("    No callback in config")
+        print('')
+        # print_cb = configs[file_def_section]["generate_callback"]
+        # if hasattr( _hooks, print_cb ):
+            # printer_hook = getattr( _hooks, print_cb )
 
-            # print( callable(name_hook) )
-            # print( callable(printer_hook) )
+        # print( callable(name_hook) )
+        # print( callable(printer_hook) )
 
+    sys.exit()
 
     # print( types )
     print('')
