@@ -51,10 +51,10 @@ Config and Makefile Changes:
 [========  ] - Re-generate the module Makefile for any existing modules
 [==========] - Add new global makefile
 [==========] - Convert Module and Clean classes to use the globber, instead of regex
-[=====     ] - Integrate test_config 3 and 4 with config.ini
+[==========] - Integrate test_config 3 and 4 with config.ini
 [          ] - Set const key values - no more string literals
 [          ] - Make getters for config dict to simplify fetching values
-[          ] - Enforce the "one-tag per file def" requirement
+[==========] - Enforce the "one-tag per file def" requirement
 [          ] - Move global makefile and test harnesses to cmod dir
 [          ] - Rename and clean-out files in cmod-lib
 

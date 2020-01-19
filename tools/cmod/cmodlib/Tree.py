@@ -35,6 +35,8 @@ def print_tree( dir, padding, print_files=False, isLast=False, isFirst=False):
         files.remove("tools")
     if "unit_test" in files:
         files.remove("unit_test")
+    if "__pycache__" in files:
+        files.remove("__pycache__")
     # Add this dir back in when this tree command gets smarter
     if "unit_testing" in files:
         files.remove("unit_testing")
