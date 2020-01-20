@@ -176,7 +176,7 @@ def get_generator_module_types( parsed_arg_namespace ):
     return module_dir, types
 
 def handle_generate( args, configs ):
-    from FileGenerator import FileGenerator
+    from FileGenerator import FileDescriptor
     PSEUDO = False
 
     # Returns all module types if none are specified in args
@@ -199,25 +199,27 @@ def handle_generate( args, configs ):
     # print( hook_source )
     hooks = __import__( hook_source, globals(), locals(), [], 0 )
 
+    fi = FileDescriptor( module, "FILE_DEF_SOURCE", configs, hooks )
+
     if PSEUDO:
         file_generators = list()
 
         for file_def in types:
-            file_gen = FileGenerator( module, file_def, hooks, configs )
+            file_gen = FileDescriptor( module, file_def, hooks, configs )
 
             # This can all be wrapped up with - if file_gen.check() == False:
-            file_gen.check_configs()
-            if file_gen.get_config_status() != OK:
-                print( file_gen.type, "bad config:", file_gen.get_status() )
-                sys.exit()
-            file_gen.test_name_callback()
-            if file_gen.get_name_callback_status() != OK:
-                print( file_gen.type, "bad name callback:", file_gen.get_name_callback_status() )
-                sys.exit()
-            file_gen.test_print_callback()
-            if file_gen.get_print_callback_status() != OK:
-                print( file_gen.type, "bad print callback:", file_gen.get_print_callback_status() )
-                sys.exit()
+            # file_gen.check_configs()
+            # if file_gen.get_config_status() != OK:
+            #     print( file_gen.type, "bad config:", file_gen.get_status() )
+            #     sys.exit()
+            # file_gen.test_name_callback()
+            # if file_gen.get_name_callback_status() != OK:
+            #     print( file_gen.type, "bad name callback:", file_gen.get_name_callback_status() )
+            #     sys.exit()
+            # file_gen.test_print_callback()
+            # if file_gen.get_print_callback_status() != OK:
+            #     print( file_gen.type, "bad print callback:", file_gen.get_print_callback_status() )
+            #     sys.exit()
 
             file_generators.append( file_gen )
 
