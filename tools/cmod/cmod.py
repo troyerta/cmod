@@ -33,13 +33,9 @@ if __name__ == "__main__":
 
     sys.path.insert( 0, os.getcwd() )
 
-    config_parser = Config()
-    configs = config_parser.get_configs()
-
-    # for section in configs.keys():
-        # print(section)
-        # for x in configs[section].keys():
-            # print('    ', x, ':', configs[section][x])
+    # This a complete SafeConfigParser, so treat it nicely
+    checked_configs = Config()
+    configs = checked_configs.get_parser()
 
     cmod_arg_parser = ArgParser( sys.argv[1:], configs=configs )
     cmod_arg_parser.cmod_entry()

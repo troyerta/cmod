@@ -3,6 +3,21 @@ import sys
 
 # Ask to overwrite the file if it already exists!
 
+'''
+SafeconfigParser useful methods:
+
+has_section()
+
+has_option()
+
+Options as Flags:
+parser = ConfigParser.SafeConfigParser(allow_no_value=True)
+
+
+
+'''
+
+
 def checkKey( key, dict ):
     if key not in dict:
         return False

@@ -1,27 +1,4 @@
 
-export
---module
---r
---test_harness
---make
---meson
-
-[RESOURCES]
-https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
-
-[TDD]
-Test Harnesses: Catch, minunit, Greatest, CppUTest API, CMocka, check
-Mocking Frameworks: FFF, CMock, HippoMocks
-https://github.com/dascandy/hippomocks
-[STATIC]
-Static Analyzers:
-Complexity:
-Formatters: Snippet of code #1! Snippet of code #1!
-https://sourceforge.net/projects/gcgreatcode/
-artistic style
-uncrustify
-https://www.gnu.org/software/indent/
-https://invisible-island.net/bcpp/
 
 TODO Before starting MCU project:
 
@@ -48,15 +25,45 @@ Config and Makefile Changes:
 [==========] - Create util function that finds files using glob
                - Best to just always return a list of matches, and handle lists instead of expecting only 1 match
 [          ] - Rewrite the way module makefiles are printed with SRC_DIR lists
-[========  ] - Re-generate the module Makefile for any existing modules
+[==========] - Re-generate the module Makefile for any existing modules
 [==========] - Add new global makefile
 [==========] - Convert Module and Clean classes to use the globber, instead of regex
 [==========] - Integrate test_config 3 and 4 with config.ini
 [          ] - Set const key values - no more string literals
-[          ] - Make getters for config dict to simplify fetching values
+[XXXXXXXXXX] - Make getters for config dict to simplify fetching values
 [==========] - Enforce the "one-tag per file def" requirement
 [          ] - Move global makefile and test harnesses to cmod dir
 [          ] - Rename and clean-out files in cmod-lib
+
+[          ] - Fix ConfigParser class: Just pass a config object around, not a dict of dicts
+This should simplify the FileDescriptor class utility functions
+
+https://bip.weizmann.ac.il/course/python/PyMOTW/PyMOTW/docs/ConfigParser/index.html
+https://docs.python.org/3/library/configparser.html
+
+[          ] - Default/Required config section should have const name define in SW
+- This const name can be used to more-cleanly access values in those default sections
+- Another API should be defined for the dual-case, which is an instance of something with a known dictionary, but with section name and values specified at runtime [FILE_DESCRIPTORS]
+- Find a way to describe the files to the Makefile?
+  - This should likely be happening in the gen_makefile_cb - written by the user anyway.
+  - They would need print out a SRC list and HEADER list themselves
+[MODULE_DEF]
+test_harness_sources = tools/test_harnesses/unity/unity.c
+makefile_sources = source test_source test_harness_sources
+test_harness_headers = tools/test_harnesses/unity/unity.h
+makefile_headers = header test_harness_headers
+
+[          ] - Make a default_settings_makefile included at the top of each module makefile, which fills in the project default settings, making any entry in between the includes a sign that the default value should be replaced. There would make each module's makefile much more minimal. These can be first filled out as a template by the user.
+[          ] - Handle cases for bad config, or no config given or present - make built-in default styles and conventions
+[          ] - Implement basic callbacks and styles in module.py
+[          ] - Implement several common naming conventions and coding styles in module.py
+[          ] - Add some copywrite and license strings in module.py to demonstrate how it could work
+[          ] - Handle module-specific/local configs, which can overwrite global config.ini
+[          ] - Fix python naming conventions throughout Cmod:
+Python recommends UpperCamelCase for class names, CAPITALIZED_WITH_UNDERSCORES for constants, and lowercase_separated_by_underscores for other names.
+If a name is intended to be "private", it is prefixed by an underscore. Private variables are enforced in Python only by convention. Names can also be suffixed with an underscore to prevent conflict with Python keywords. Prefixing with double underscores changes behaviour in classes with regard to name mangling. Prefixing and suffixing with double underscores are reserved for "magic names" which fulfill special behaviour in Python objects.
+[          ] - Write a CONTRIBUTING_GUIDE.md and a STYLE_GUIDE.md
+[          ] - Enable file generator name overrides - see cmod_notes - 51
 
 - Add test harness to config.ini
 - See test_config4.ini
@@ -158,6 +165,29 @@ General:
 
 
 
+cmod export
+--module
+--r
+--test_harness
+--make
+--meson
+
+[RESOURCES]
+https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
+
+[TDD]
+Test Harnesses: Catch, minunit, Greatest, CppUTest API, CMocka, check
+Mocking Frameworks: FFF, CMock, HippoMocks
+https://github.com/dascandy/hippomocks
+[STATIC]
+Static Analyzers:
+Complexity:
+Formatters: Snippet of code #1! Snippet of code #1!
+https://sourceforge.net/projects/gcgreatcode/
+artistic style
+uncrustify
+https://www.gnu.org/software/indent/
+https://invisible-island.net/bcpp/
 
 
 
