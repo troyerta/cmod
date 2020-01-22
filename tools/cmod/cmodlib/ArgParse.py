@@ -153,13 +153,11 @@ def handle_help( args, configs ):
     print("handling help")
 
 def parse_generate_args( args, configs ):
-    file_generator_dict = configs["CMOD_FILE_GENERATORS"]
-
     parser = argparse.ArgumentParser( description=cmd_description_generate, usage=cmd_usage_generate )
     if generate_args is not None:
         [parser.add_argument( *arg[0], **arg[1] ) for arg in generate_args]
     # Add each generator key as a stored arg flag
-    [parser.add_argument( '--'+key, dest=key, action='store_true' ) for key in file_generator_dict.keys()]
+    [parser.add_argument( '--'+key, dest=key, action='store_true' ) for key in configs["CMOD_FILE_GENERATORS"]]
     parsed_args = parser.parse_args( args )
     return parsed_args
 
@@ -176,7 +174,7 @@ def get_generator_module_types( parsed_arg_namespace ):
     return module_dir, types
 
 def handle_generate( args, configs ):
-    from FileGenerator import FileDescriptor
+    from FileGenerator import GeneratedFileDescriptor
     PSEUDO = False
 
     # Returns all module types if none are specified in args
@@ -199,69 +197,53 @@ def handle_generate( args, configs ):
     # print( hook_source )
     hooks = __import__( hook_source, globals(), locals(), [], 0 )
 
-    fi = FileDescriptor( module, "FILE_DEF_SOURCE", configs, hooks )
+    # fi = FileDescriptor( module, "FILE_DEF_SOURCE", configs, hooks )
 
-    if PSEUDO:
-        file_generators = list()
+    # Need to make some GeneratedFileDescriptors and maybe some BuildArtifactFileDescriptors
+    file_generators = list()
 
-        for file_def in types:
-            file_gen = FileDescriptor( module, file_def, hooks, configs )
+    for file_def in types:
+        file_gen = GeneratedFileDescriptor( module, configs["CMOD_FILE_GENERATORS"][file_def], configs, hooks )
+        file_generators.append( file_gen )
 
-            # This can all be wrapped up with - if file_gen.check() == False:
-            # file_gen.check_configs()
-            # if file_gen.get_config_status() != OK:
-            #     print( file_gen.type, "bad config:", file_gen.get_status() )
-            #     sys.exit()
-            # file_gen.test_name_callback()
-            # if file_gen.get_name_callback_status() != OK:
-            #     print( file_gen.type, "bad name callback:", file_gen.get_name_callback_status() )
-            #     sys.exit()
-            # file_gen.test_print_callback()
-            # if file_gen.get_print_callback_status() != OK:
-            #     print( file_gen.type, "bad print callback:", file_gen.get_print_callback_status() )
-            #     sys.exit()
+        # MAKE SURE CALLBACKS WORK FOR EACH key in "types"
 
-            file_generators.append( file_gen )
+            # Check if name cb key is present
+            # and if name_cb is populated with something
+            # and if hooks module has that something as an attribute
+            # Then get that attr and make sure it is callable
+            # If callable, then keep it somewhere safe
 
-            # MAKE SURE CALLBACKS WORK FOR EACH key in "types"
+            # Check if print cb key is present
+            # and if name_cb is populated with something
+            # and if hooks module has that something as an attribute
+            # Then get that attr and make sure it is callable
+            # If callable, then keep it somewhere safe
 
-                # Check if name cb key is present
-                # and if name_cb is populated with something
-                # and if hooks module has that something as an attribute
-                # Then get that attr and make sure it is callable
-                # If callable, then keep it somewhere safe
+            # If both callbacks are found callable, then create a new FileGenerator() object
+            # and add it to a list
 
-                # Check if print cb key is present
-                # and if name_cb is populated with something
-                # and if hooks module has that something as an attribute
-                # Then get that attr and make sure it is callable
-                # If callable, then keep it somewhere safe
+    # Print the list in a preview window
+    print('')
+    print('would generate:')
 
-                # If both callbacks are found callable, then create a new FileGenerator() object
-                # and add it to a list
+    print("\n\nwith callback names:")
+    [ print(file_gen.name_gen_callback) for file_gen in file_generators ]
+    print('')
+    answer = input("Generate? Y/n: ")
+    if answer != 'n':
+        pass
+    else:
+        print("canceled")
+        sys.exit()
 
-        # Print the list in a preview window
-        print('')
-        print('would generate:')
-        [ print(file_gen.get_filename()) for file_gen in file_generators ]
-        print('')
-        answer = input("Generate? Y/n: ")
-        if answer != 'n':
-            pass
-        else:
-            print("canceled")
-            sys.exit()
-
-        [ file_gen.gen_file() for file_gen in file_generators ]
-        # END PSEUDOCODE
-
-    file_generator_dict = configs["CMOD_FILE_GENERATORS"]
+    [ file_gen.gen_file() for file_gen in file_generators ]
 
     # Now we can use types to lookup section headers in this thing
     # List the FILE DEFs we will use - show user a preview of what will be made
     for key in types:
-        print("Would make a", key, "by using", file_generator_dict[key], "FILE GENERATOR" )
-        file_def_section = file_generator_dict[key]
+        print("Would make a", key, "by using", configs["CMOD_FILE_GENERATORS"][key], "FILE GENERATOR" )
+        file_def_section = configs["CMOD_FILE_GENERATORS"][key]
 
         name_cb = configs[file_def_section]["name_callback"]
         # attrs = dir(name_cb)

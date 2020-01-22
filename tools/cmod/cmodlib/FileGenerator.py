@@ -45,9 +45,9 @@ def checkEntryIsPopulated( key, dict, section ):
         return key
 
 def checkEntryExistsAndPopulated( key, dict, section ):
-    temp = checkEntryExists( key, dict, section )
-    temp = checkEntryIsPopulated( key, dict, section )
-    return key
+    temp1 = checkEntryExists( key, dict, section )
+    temp2 = checkEntryIsPopulated( temp1, dict, section )
+    return temp2
 
 class FileDescriptor:
     def __init__( self, module, config_section, configs, hooks ):
@@ -60,13 +60,16 @@ class FileDescriptor:
 
 class GeneratedFileDescriptor( FileDescriptor ):
     def __init__( self, module, config_section, configs, hooks ):
-        super.__init__( module, config_section, configs, hooks )
-        self.name_gen_callback = checkEntryExistsAndPopulated( "name_callback", configs[self.config_section], self.config_section )
-        self.file_gen_callback = checkEntryExistsAndPopulated( "generate_callback", configs[self.config_section], self.config_section )
+        super().__init__( module, config_section, configs, hooks )
+        self.name_gen_key = checkEntryExistsAndPopulated( "name_callback", configs[self.config_section], self.config_section )
+        self.file_gen_key = checkEntryExistsAndPopulated( "generate_callback", configs[self.config_section], self.config_section )
+
+        self.name_gen_callback = configs[ self.config_section ][self.name_gen_key]
+        self.file_gen_callback = configs[ self.config_section ][self.file_gen_key]
 
 class BuildArtifactFileDescriptor( FileDescriptor ):
     def __init__( self, module, config_section, configs, hooks ):
-        super.__init__( module, config_section, configs, hooks )
+        super().__init__( module, config_section, configs, hooks )
 
         # More complex checking logic here since only one of these fields is required to even be present and populated
         self.prefix = configs[self.config_section]["prefix"]
