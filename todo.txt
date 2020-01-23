@@ -1,60 +1,56 @@
 
-
-TODO Before starting MCU project:
-
 Tests:
 [          ] - Module test scripts should take an argument that enables results to be printed or redirected to some file
 [          ] - Add fff to test generator - add it commented out during test source generation?
 [          ] - Add option to "./cmod test -m=module_name"  : -s=SUITE_NAME - To build/run only the specified suite to the runner - should this be a cmod list feature?
 
 Config and Makefile Changes:
-
-[          ] - Finish callback implementations
-[==========] - Finish Task queue
-[          ] - Rewrite the way module makefiles are printed with SRC_DIR lists
+[==========] - Finish callback implementations
+[=======   ] - Finish Task queue - print return values properly and queue data
+[          ] - Try to add includes to generated source files
+[          ] - Check generated files against it's config glob to warn if the file name does not match glob
+[          ] - Teach makefile to use paths and globs from certain FILE_DEF sections
+             - Make a default_settings_makefile included at the top of each module makefile, which fills in the project default settings, making any entry in between the includes a sign that the default value should be replaced. There would make each module's makefile much more minimal. These can be first filled out as a template by the user.
 [          ] - Set const key values - no more string literals
 [          ] - Move global makefile and test harnesses to cmod dir
 [          ] - Rename and clean-out files in cmod-lib
 [          ] - Default/Required config sections should have const name define in SW
-
-[MODULE_DEF]
-test_harness_sources = tools/test_harnesses/unity/unity.c
-makefile_sources = source test_source test_harness_sources
-test_harness_headers = tools/test_harnesses/unity/unity.h
-makefile_headers = header test_harness_headers
-
-[          ] - Make a default_settings_makefile included at the top of each module makefile, which fills in the project default settings, making any entry in between the includes a sign that the default value should be replaced. There would make each module's makefile much more minimal. These can be first filled out as a template by the user.
+[==========] - Config should just become a single dictionary that gets read once, then passed around all over the place?
+             - Demand that all modules have the same structure everywhere?
+             - Or Store a module's structure in a config.ini local to the module?
+             - Store settings in an ini IFF the module needs to differ in structure from the default?
+[          ] - Make config section for Test Harness settings, paths
+             test_harness_sources = tools/test_harnesses/unity/unity.c
+             makefile_sources = source test_source test_harness_sources
+             test_harness_headers = tools/test_harnesses/unity/unity.h
+             makefile_headers = header test_harness_headers
+[          ] - Need a function that checks Configs and filling in defaults as necessary
+[          ] - Eliminate literal magic string in accesses to module_configs dict so the list of expected config key
+             - go from:
+             name = mod_configs["some_name_setting"]
+             move to:
+             name_setting_key = "some_name_setting"
+             name = mod_configs[name_setting_key]
 [          ] - Handle cases for bad config, or no config given or present - make built-in default styles and conventions
 [          ] - Implement basic callbacks and styles in module.py
 [          ] - Implement several common naming conventions and coding styles in module.py
 [          ] - Add some copywrite and license strings in module.py to demonstrate how it could work
 [          ] - Handle module-specific/local configs, which can overwrite global config.ini
 [          ] - Fix python naming conventions throughout Cmod:
-Python recommends UpperCamelCase for class names, CAPITALIZED_WITH_UNDERSCORES for constants, and lowercase_separated_by_underscores for other names.
-If a name is intended to be "private", it is prefixed by an underscore. Private variables are enforced in Python only by convention. Names can also be suffixed with an underscore to prevent conflict with Python keywords. Prefixing with double underscores changes behaviour in classes with regard to name mangling. Prefixing and suffixing with double underscores are reserved for "magic names" which fulfill special behaviour in Python objects.
+             - Python recommends UpperCamelCase for class names, CAPITALIZED_WITH_UNDERSCORES for constants, and lowercase_separated_by_underscores for other names.
+             - If a name is intended to be "private", it is prefixed by an underscore. Private variables are enforced in Python only by convention. Names can also be suffixed with an underscore to prevent conflict with Python keywords. Prefixing with double underscores changes behaviour in classes with regard to name mangling. Prefixing and suffixing with double underscores are reserved for "magic names" which fulfill special behaviour in Python objects.
 [          ] - Write a CONTRIBUTING_GUIDE.md and a STYLE_GUIDE.md
 [          ] - Enable file generator name overrides - see cmod_notes - 51
-
-- Add test harness to config.ini
-- See test_config4.ini
-This also makes the case that each file def
-needs to have a universal string associated with
-it, so it can be referred to as a generation flag, a cleaning flag, used to tell which files the makefile should compile, which headers/directories to include, etc.
-In the same way, we should be able to use the config file to point to our test harness files, but specifying the regexes for finding the tests and groups is still not very... configurable.... rats.
-This also makes the case that cmod should write the module makefile in a more general way:
-SRC_DIRS = . unit_testing/tests unit_testing/runners
-
-New Module Makefile:
-- See new_mk.mk
+[          ] - Add test harness settings to config.ini
 
 List:
 [          ] - Make a verbose flag option for "list" command, which can print out a summary of all the files that cmod finds in a module given the current config regexes
 [          ] - List all modules under the specified parent module via cmod list --m=module
 [          ] - List all modules with their test suites/groups under the specified parent module via cmod list --m=module --suites
-  - Now, we should be able to run this via "cmod test --m=module --suites=?" which is the same as "cmod list --m=module --suites" Which will list the suites in that module
-  - Now we can go and run just that specified suite: cmod test --module=HWM --suite=TEST_HWM_SUITE
-    Or possibly even
-    cmod test --module=HWM --suite=TEST_HWM_SUITE --test=TestNumbersDontExplode
+             - Now, we should be able to run this via "cmod test --m=module --suites=?" which is the same as "cmod list --m=module --suites" Which will list the suites in that module
+             - Now we can go and run just that specified suite: cmod test --module=HWM --suite=TEST_HWM_SUITE
+             Or possibly even
+             cmod test --module=HWM --suite=TEST_HWM_SUITE --test=TestNumbersDontExplode
 
 Makefile:
 [          ] - Add an production code "header_dir" option to the config, and add to Makefile include flags
@@ -62,85 +58,37 @@ Makefile:
 
 Setup and Install:
 [          ] - Make a bash script that runs the python venv setup and installation
-https://stackoverflow.com/questions/53151899/python-how-to-script-virtual-environment-building-and-activation
-https://stackoverflow.com/questions/57921255/how-to-create-python-virtual-environment-within-a-python-script
+             https://stackoverflow.com/questions/53151899/python-how-to-script-virtual-environment-building-and-activation
+             https://stackoverflow.com/questions/57921255/how-to-create-python-virtual-environment-within-a-python-script
 [          ] - Fix the project-level scripts to check for the proper venv before running, or maybe just a init/config script
 
-Configuration:
-[==========] - Config should just become a single dictionary that gets read once, then passed around all over the place?
-- Demand that all modules have the same structure everywhere?
-- Or Store a module's structure in a config.ini local to the module?
-- Store settings in an ini IFF the module needs to differ in structure from the default?
-
 Generation:
-[=======   ] - FileGenerator.build() needs a new solution - refactor entire thing
 [          ] - Add "This is a generated file" warning to the files that should not be hand-modified
-            [    ] - /* Do not modify - this is a generated file. Please refer to *** to modify the way this file is made
+             - /* Do not modify - this is a generated file. Please refer to *** to modify the way this file is made
 [          ] - Draft up a copy of the licensing text to be used
-            [    ] -
-[==        ] - Make generator addition/deletion configurable
-[          ] - Make a module exporter (generates makefile and copies test harness to a target dir for testing module outside of project)
-$ cmod export --m=dsp --r --o=../dsp
-[          ] - Refactor the way generation works
-    - Module generation is done with a list of file generators
-    - file generators are python modules in some dir, that contain callbacks that cmod uses to create the a file
-    - Multiple file generators can live in the same style_hooks.py module to define a consistent generation style, (K&R, allman, Hungarian naming notation)
-    - Multiple modules can exist in the same project, and just need to be called out in config.ini
-    - Each file generator must define the following callbacks:
-        - gen_filename() - What the file is named
-        - gen_filepath() - Where the file lives
-        - gen_file()     - implements the code style with file write operations
-    - Each generator has a name
-    - A module generator is just a list of file generators
-        - The list can be specifed explicitly, or with a name group of generators that define a coding style
-    - MODULE_DEF and STYLE sections should be merged, and then called out as a single "style" element in the config
-    - Or just put all the options under "MODULE_DEF_A", so another set of options could live in "MODULE_DEF_B"
-    - And we could also specify a "DEFAULT_MODULE_DEF" section to fall back on if an option is not present in "MODULE_DEF_A"
-    - Remove style_config args - it's now unnecessary
-
-Add option to randomize during testing:
-  module list
-  test group list
-  test list
-
-import io
-io.__file__ - name and path of module file from which it is loaded
-io.__dict__ - dictionary are all attributes and functions
-
-[        ] - Config class should become a dictionary of dictionaries (or sections)
-[        ] - Need a function that converts Configs to a module definition class, filling in defaults as necessary
-[        ] - Eliminate literal magic string in accesses to module_configs dict so the list of expected config key
-
-[         ] - go from:
-name = mod_configs["some_name_setting"]
-move to:
-name_setting_key = "some_name_setting"
-name = mod_configs[name_setting_key]
+[          ] - Make a module exporter (generates makefile and copies test harness to a target dir for testing module outside of project) $ cmod export --m=dsp --r --o=../dsp
+[          ] - Add option to randomize during testing: module list, test group list, test list
 
 General:
+[          ] - Replace "cmod" and ArgParse.py with cmodmain.py - see mesonmain.py for reference
 [=         ] - Finish "help" messages in scripts
-[          ] - Set a git commit template using "git config commit.template relative-path-from-repository-root"
-[          ] - Move utest folder to cmod dir as a "plugin" or "aux" directory
+[     ?    ] - Move utest folder to cmod dir as a "plugin" or "aux" directory
 [=         ] - Write manual and examples and demos - "Release" version v0.01 on github
-[          ] - Add license to top of every source file
+[          ] - There should be 2 demos: Simple and minimal, and then a complete "tour guide" of advanced usage
+[          ] - Add license to top of every python source file
 [          ] - Possible to get rid of module makefiles iff all modules use the same config.ini settings
-- Explore the cost of asking for this constraint.
-- Might still be nice to have custom settings possible for each module
-[          ] - Define a task queue that sends jobs to a process pool using python multiprocessing
+             - Explore the cost of asking for this constraint.
+             - Might still be nice to have custom settings possible for each module
 [          ] - Add timing attr to each test run process
 [          ] - Add --version argument
-[          ] - Add a carraige return output mode option config
-[          ] - Print during test, or only after test is complete - config
-
-
-
-
-cmod export
---module
---r
---test_harness
---make
---meson
+[          ] - Print during test, or only after test is complete - add to config
+[          ] - Make cmod export function
+             cmod export
+             --module
+             --r
+             --test_harness
+             --make
+             --meson
 
 [RESOURCES]
 https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
@@ -159,9 +107,6 @@ uncrustify
 https://www.gnu.org/software/indent/
 https://invisible-island.net/bcpp/
 
-
-
-
 [Cmod AUX]
 
 Selectable Test Harness Support:
@@ -170,7 +115,7 @@ Selectable Test Harness Support:
 [          ] - Make a mocks wrapper - attach to config class
 
 Selectable Build System Support:
-- Make, Meson, Ninja, CMake?
+- Make, Meson, Ninja, CMake, waf?
 
 Selectable Host Toolchain Support:
 [          ] - Make host toolchain configurable, GCC, Clang
@@ -208,17 +153,16 @@ Coverage Scripting:
 
 Cmod Project:
 [          ] - Add script that can do venv stuff: Use config class to add/remove python packages to venv
-- Makes sure that python3 is installed - callable from environment
-- Makes sure that pip or pip3 is installed - callable from environment
-- Checks for venv
-- Removes venv
-- Sets up venv
-- Adds package to venv, updates requirements.txt
-python3.8 -m venv tools/cmod/venv
-source tools/venv/bin/activate
-pip3.8 install -r requirements.txt
-deactivate - TODO: make the tools/ dir configurable when setup.py runs
-
+             - Makes sure that python3 is installed - callable from environment
+             - Makes sure that pip or pip3 is installed - callable from environment
+             - Checks for venv
+             - Removes venv
+             - Sets up venv
+             - Adds package to venv, updates requirements.txt
+             python3.8 -m venv tools/cmod/venv
+             source tools/venv/bin/activate
+             pip3.8 install -r requirements.txt
+             deactivate - TODO: make the tools/ dir configurable when setup.py runs
 [=====     ] - Start adding other python modules
 [          ] - look into adding pre-post-commit git hooks for doing some more stuff automatically
 

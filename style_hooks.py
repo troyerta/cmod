@@ -132,11 +132,89 @@ def print_source( module_dir, configs ):
 
 # test_source
 
-def print_test_source( module_dir, configs ):
-    print("Printing test source:")
+#--------------------------------------
+# Utility functions
+#--------------------------------------
+def print_section_header( file, name ):
+    file.write('/**********************************************************\n')
+    file.write('| '+name+'\n')
+    file.write('**********************************************************/\n')
+
+def print_unity_test_group_decl( file, group_name ):
+    file.write('TEST_GROUP( ' + group_name + ' );\n')
+
+def print_unity_test_group_setup_decl( file, group_name ):
+    file.write('TEST_SETUP( ' + group_name + ' )\n')
+    file.write('{\n\n')
+    file.write('}\n')
+
+def print_unity_test_group_teardown_decl( file, group_name ):
+    file.write('TEST_TEAR_DOWN( ' + group_name + ' )\n')
+    file.write('{\n\n')
+    file.write('}\n')
+
+def print_unity_test_case( file, group_name ):
+    file.write('TEST( ' + group_name + ', sampleTest )\n')
+    file.write('{\n')
+    file.write('TEST_IGNORE_MESSAGE( \"Tests for ' + group_name + ' are working\" );\n')
+    file.write('}\n')
 
 def gen_test_source_pathname( module_dir, configs ):
-    return "tests.c"
+    path_parts = splitpath( module_dir )
+    basename = "test_" + path_parts[-1].lower() + "_tests.c"
+    module = module_name_callback( module_dir, configs )
+    full_path = os.path.join( module, configs["FILE_DEF_TEST_SOURCE"]["path"], basename )
+    full_path = os.path.normpath( full_path )
+    return full_path
+
+def print_test_source( module_dir, configs ):
+    date = get_date_str()
+    file_path = gen_test_source_pathname( module_dir, configs )
+    # header_include = gen_path_header( module_path, configs )
+    # print( file_path )
+    basename = os.path.normpath( os.path.basename( file_path ) )
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    project_name = configs["GLOBAL"]["project"]
+    author = configs["GLOBAL"]["author"]
+    license = configs["GLOBAL"]["license"]
+    repo = configs["GLOBAL"]["repo"]
+    test_group_name = os.path.basename(module_name_callback( module_dir, configs ).upper().strip("/"))+"_TEST_GROUP_A"
+
+    with open(file_path, "w+") as f:
+        f.write('/**********************************************************\n')
+        f.write('| '+project_name+' - '+basename+' \n')
+        f.write('| Author: '+author+'\n')
+        f.write('| Date: '+date+'\n')
+        f.write('| License: '+license+'\n')
+        f.write('| Repository: '+repo+'\n')
+        f.write('| Description:\n')
+        f.write('**********************************************************/\n')
+        f.write('\n')
+        print_section_header(f,'Includes')
+        f.write("#include \"unity_fixture.h\"\n")
+        # print_include_potential_header(f, header_include)
+        f.write('\n')
+        print_section_header(f,'Test Groups')
+        print_unity_test_group_decl(f, test_group_name)
+        f.write('\n')
+        print_section_header(f,'Types')
+        f.write('\n')
+        print_section_header(f,'Literal Constants')
+        f.write('\n')
+        print_section_header(f,'Memory Constants')
+        f.write('\n')
+        print_section_header(f,'Variables')
+        f.write('\n')
+        print_section_header(f,'Macros')
+        f.write('\n')
+        print_section_header(f,'Test Setup and Teardown')
+        print_unity_test_group_setup_decl( f, test_group_name )
+        f.write('\n')
+        print_unity_test_group_teardown_decl( f, test_group_name )
+        f.write('\n')
+        print_section_header(f,'Tests')
+        print_unity_test_case( f, test_group_name )
+        f.close()
 
 # runner
 
@@ -151,15 +229,77 @@ def print_test_runner( module_dir, configs ):
 # makefile
 
 def gen_makefile_pathname( module_dir, configs ):
-    return "Makefile"
+    return os.path.normpath( os.path.join( module_name_callback( module_dir, configs ), configs["FILE_DEF_SOURCE"]["path"], "Makefile" ) )
 
 def print_makefile( module_dir, configs ):
-    print("Printing makefile:")
+    file_path = gen_makefile_pathname( module_dir, configs )
+    # print( file_path )
+
+    depth = len( splitpath( file_path )) - 1
+    # print( depth )
+
+    project_root_dir = '../'
+    for each in range(depth-1):
+        project_root_dir = os.path.join( project_root_dir, '../' )
+
+    template_path = os.path.join( "$(PROJ_ROOT)", "unit_test", "module_makefile" )
+    # print("\ttemplate_path =", template_path)
+
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "w+") as f:
+        f.write('\n')
+        # Make this part test harness agnostic as well
+        f.write( 'MODULE_DIR = ' + os.path.dirname( file_path ) + '\n' )
+        f.write( 'PROJ_ROOT = ' + project_root_dir + '\n' )
+        f.write( 'SRC_DIR = ' + configs["FILE_DEF_SOURCE"]['path'] + '\n' )
+        f.write( 'HDR_DIR = ' + configs["FILE_DEF_HEADER"]['path'] + '\n' )
+        f.write( 'TESTS_DIR = ' + configs["FILE_DEF_TEST_SOURCE"]['path'] + '\n' )
+        f.write( 'RUNNER_DIR = ' + configs["FILE_DEF_TEST_RUNNER"]['path'] + '\n' )
+        f.write( 'EXE_DIR = ' + configs["FILE_DEF_TEST_BUILD"]['path'] + '\n' )
+        f.write( 'RESULTS_DIR = ' + configs["FILE_DEF_TEST_RESULT"]['path'] + '\n' )
+        f.write( 'RESULTS_TXT_PREFIX = ' + configs["FILE_DEF_TEST_RESULT"]['prefix'] + '\n' )
+        f.write( 'RESULTS_TXT_SUFFIX = ' + configs["FILE_DEF_TEST_RESULT"]['suffix'] + '\n' )
+        f.write( 'include ' + template_path )
+        f.write( '\n' )
+        f.close()
 
 # script
 
 def gen_test_script_pathname( module_dir, configs ):
-    return "test"
+    return os.path.normpath( os.path.join( module_name_callback( module_dir, configs ), configs["FILE_DEF_SOURCE"]["path"], "test" ) )
 
 def print_test_script( module_dir, configs ):
-    print("Printing test script:")
+    project_root_dir = '../'
+    file_path = gen_test_script_pathname( module_dir, configs )
+
+    depth = len( splitpath( file_path )) - 1
+    for each in range(depth-1):
+        project_root_dir = os.path.join( project_root_dir, '../' )
+
+    env_path = os.path.join( project_root_dir, 'tools', 'cmod', 'venv', 'bin', 'python3' )
+
+    os.makedirs(module_dir, exist_ok=True)
+
+    with open(file_path, "w+") as f:
+        f.write('#!' + env_path + '\n')
+        f.write('\n')
+        f.write('import sys\n')
+        f.write('import subprocess\n')
+        f.write('\n')
+        f.write('module_path = \'' + module_dir + '\'\n')
+        f.write('root_path = \'' + project_root_dir + '\'\n')
+        f.write('\n')
+        f.write('def main():\n')
+
+        f.write('\tsubproc_cmd = [ \'./cmod\', \'test\', \'--m=\'+module_path ]\n\n')
+        f.write('\tif len(sys.argv) > 1:\n')
+        f.write('\t\t[subproc_cmd.append( arg ) for arg in sys.argv[1:]]\n')
+        f.write('\tp1 = subprocess.Popen( subproc_cmd, cwd=root_path )\n')
+        f.write('\tp1.wait()\n')
+        f.write('\tsys.exit()\n')
+        f.write('\n')
+        f.write('if __name__ == \"__main__\":\n')
+        f.write('\tmain()\n')
+        f.close()
+
+        os.chmod(file_path, 509)

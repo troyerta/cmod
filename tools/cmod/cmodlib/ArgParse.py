@@ -6,8 +6,6 @@ from TaskQueue import run
 from ProcQueue import multi_proc
 import time
 
-# sys.path.insert(1, 'tools/cmod/cmodlib/generators')
-
 # These are the different ways to invoke associated commands
 help_types     = [ 'help', 'h', '-h', '--h', '--help' ]
 generate_types = [ 'generate', 'gen' ]
