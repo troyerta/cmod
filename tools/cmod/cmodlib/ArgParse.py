@@ -6,7 +6,7 @@ from TaskQueue import run
 from ProcQueue import multi_proc
 import time
 
-sys.path.insert(1, 'tools/cmod/cmodlib/generators')
+# sys.path.insert(1, 'tools/cmod/cmodlib/generators')
 
 # These are the different ways to invoke associated commands
 help_types     = [ 'help', 'h', '-h', '--h', '--help' ]
@@ -190,18 +190,18 @@ def handle_generate( args, configs ):
             module = module_name_callback( module, configs )
 
     # print(types)
-    file_generators = [ GeneratedFileDescriptor( module, configs["CMOD_FILE_GENERATORS"][file_def], configs, hooks ) for file_def in types ]
+    file_generators = [ GeneratedFileDescriptor( module, configs[ "CMOD_FILE_GENERATORS" ][ file_def ], configs, hooks ) for file_def in types ]
 
-    print('\nwould generate:\n')
+    print( '\nwould generate:\n' )
     [ print( file_gen.gen_name( module, configs ) ) for file_gen in file_generators ]
     print('')
 
-    # answer = input("Generate? Y/n: ")
-    # if answer != 'n':
-    #     pass
-    # else:
-    #     print("canceled")
-    #     sys.exit()
+    answer = input( "Generate? Y/n: " )
+    if answer != 'n':
+        pass
+    else:
+        print( "canceled" )
+        sys.exit()
 
     [ file_gen.gen_file( module, configs ) for file_gen in file_generators ]
     print('')
@@ -275,7 +275,7 @@ def handle_clean( args, configs ):
 
     parser = argparse.ArgumentParser( description=cmd_description_clean, usage=cmd_usage_clean )
     if clean_args is not None:
-        [parser.add_argument( *arg[0], **arg[1] ) for arg in clean_args]
+        [ parser.add_argument( *arg[0], **arg[1] ) for arg in clean_args ]
     my_args = parser.parse_args( args )
 
     cleaner = Cleaner( my_args, configs )
@@ -331,18 +331,6 @@ class CmodCommand:
         self.description = cmd_descriptions_dict[cmd]
         self.usage = cmd_usage_msg_dict[cmd]
         self.help_msg = cmd_help_msg_dict[cmd]
-        self.parser = None
-
-    # Produce a namespace variable with the argparser, given the passed-in arguments
-    # def get_arg_namespace( self, args ):
-        # parser = argparse.ArgumentParser( description=self.description, usage=self.usage )
-        # if self.arg_types is not None:
-            # [parser.add_argument( *arg[0], **arg[1] ) for arg in self.arg_types]
-
-            # Consider passing the parser over to the handler, so each command
-            # can optionally add runtime-generated arguments - like clean's
-            # ability to ID files to clean with flags generated from the config
-            # self.arg_namespace = parser.parse_args( args )
 
     # This where configs and arguments are passed to Cmod commands
     def run( self, args, configs ):
