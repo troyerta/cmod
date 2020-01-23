@@ -4,19 +4,9 @@ import sys
 # Ask to overwrite the file if it already exists!
 
 '''
-SafeconfigParser useful methods:
-
-has_section()
-
-has_option()
-
 Options as Flags:
 parser = ConfigParser.SafeConfigParser(allow_no_value=True)
-
-
-
 '''
-
 
 def checkKey( key, dict ):
     if key not in dict:
@@ -25,21 +15,21 @@ def checkKey( key, dict ):
 
 def checkSectionExists( key, dict ):
     if checkKey( key, dict ) == False:
-        print( '\''+key+'\'', "section not found in config.ini" )
+        print( "CMod config error: section", '\''+key+'\'', "could not be found in config.ini" )
         sys.exit()
     else:
         return key
 
 def checkEntryExists( key, dict, section ):
     if checkKey( key, dict ) == False:
-        print( '\''+key+'\'', "entry not found in", '\''+section+'\'' )
+        print( "CMod config error: option", '\''+key+'\'', "could not be found in section", '\''+section+'\'' )
         sys.exit()
     else:
         return key
 
 def checkEntryIsPopulated( key, dict, section ):
     if dict[key] == '':
-        print( '\''+key+'\'', "in", section, "is without a value" )
+        print( "CMod config error: option", '\''+key+'\'', "in section", '\''+section+'\'', "is without a value" )
         sys.exit()
     else:
         return key
@@ -50,22 +40,40 @@ def checkEntryExistsAndPopulated( key, dict, section ):
     return temp2
 
 class FileDescriptor:
-    def __init__( self, module, config_section, configs, hooks ):
-        print("Making a FileGenerator class..")
+    def __init__( self, module, config_section, configs ):
         self.config_section = checkSectionExists( config_section, configs )
-
         self.path = checkEntryExistsAndPopulated( "path", configs[ self.config_section ], self.config_section )
         self.glob = checkEntryExistsAndPopulated( "glob", configs[ self.config_section ], self.config_section )
-        self.hooks = hooks
 
 class GeneratedFileDescriptor( FileDescriptor ):
     def __init__( self, module, config_section, configs, hooks ):
-        super().__init__( module, config_section, configs, hooks )
+        super().__init__( module, config_section, configs )
         self.name_gen_key = checkEntryExistsAndPopulated( "name_callback", configs[self.config_section], self.config_section )
         self.file_gen_key = checkEntryExistsAndPopulated( "generate_callback", configs[self.config_section], self.config_section )
 
-        self.name_gen_callback = configs[ self.config_section ][self.name_gen_key]
-        self.file_gen_callback = configs[ self.config_section ][self.file_gen_key]
+        self.name_gen_callback_name = configs[ self.config_section ][self.name_gen_key]
+        self.file_gen_callback_name = configs[ self.config_section ][self.file_gen_key]
+
+        self.hooks = hooks
+
+        self.gen_name = self.check_callback( self.hooks, self.name_gen_callback_name )
+        self.gen_file = self.check_callback( self.hooks, self.file_gen_callback_name )
+
+        self.filename = None
+
+    # Returns the callback if valid
+    def check_callback( self, hooks, callback_name ):
+        if not callback_name:
+            print( "callback not found in config" )
+            sys.exit()
+        if not hasattr( hooks, callback_name ):
+            print( "callback", "\'"+callback_name+"\'", "in config could not be found in", hooks )
+            sys.exit()
+        callback = getattr( hooks, callback_name )
+        if not callable( callback ):
+            print( "callback", "\'"+callback_name+"\'", "is not callable from", hooks )
+            sys.exit()
+        return callback
 
 class BuildArtifactFileDescriptor( FileDescriptor ):
     def __init__( self, module, config_section, configs, hooks ):
@@ -74,27 +82,3 @@ class BuildArtifactFileDescriptor( FileDescriptor ):
         # More complex checking logic here since only one of these fields is required to even be present and populated
         self.prefix = configs[self.config_section]["prefix"]
         self.suffix = configs[self.config_section]["suffix"]
-
-    # def check( self ):
-    #     pass
-
-    # def check_configs( self ):
-    #     pass
-
-    # def get_config_status( self ):
-    #     pass
-
-    # def get_name_callback_status( self ):
-    #     pass
-
-    # def get_print_callback_status( self ):
-    #     pass
-
-    # def get_status( self ):
-    #     pass
-
-    # def test_name_callback( self ):
-    #     pass
-
-    # def test_print_callback( self ):
-    #     pass

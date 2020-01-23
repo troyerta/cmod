@@ -3,50 +3,19 @@
 TODO Before starting MCU project:
 
 Tests:
-[==========] - Module test scripts should take an argument that enables results to be printed or redirected to some file
-            [    ] - Step 1:
+[          ] - Module test scripts should take an argument that enables results to be printed or redirected to some file
 [          ] - Add fff to test generator - add it commented out during test source generation?
-[==========] - Add another verbosity level to handle printed test summary
-[========  ] - Remove test suite source file, just build suites into Runner source
-            [====] - config.ini: Rm line 23-25, line 51
-            [====] - gen_module_makefile.py lines 37,45,46
-            [====] - TestModule.py: line 19,20,21 modify gen_test_suites() in TestModule class
-            [====] - module_makefile: Rm all refs to SUITE_DIR and SUITE_SRC
-            [====] -  Rm suite stuff from each module's makefile
-            [    ] - Add option to "./cmod test -m=module_name"  : -s=SUITE_NAME
-                    To build/run only the specified suite to the runner
-            - should this be a cmod list feature?
+[          ] - Add option to "./cmod test -m=module_name"  : -s=SUITE_NAME - To build/run only the specified suite to the runner - should this be a cmod list feature?
 
 Config and Makefile Changes:
 
-[==========] - Set Task queue to run tests if > 20 modules are found
-[==========] - Set default verbosity to 4
-[==========] - Add file search glob to FILE DEFS
-[==========] - Create util function that finds files using glob
-               - Best to just always return a list of matches, and handle lists instead of expecting only 1 match
+[==========] - Finish Task queue
 [          ] - Rewrite the way module makefiles are printed with SRC_DIR lists
-[==========] - Re-generate the module Makefile for any existing modules
-[==========] - Add new global makefile
-[==========] - Convert Module and Clean classes to use the globber, instead of regex
-[==========] - Integrate test_config 3 and 4 with config.ini
 [          ] - Set const key values - no more string literals
-[XXXXXXXXXX] - Make getters for config dict to simplify fetching values
-[==========] - Enforce the "one-tag per file def" requirement
 [          ] - Move global makefile and test harnesses to cmod dir
 [          ] - Rename and clean-out files in cmod-lib
+[          ] - Default/Required config sections should have const name define in SW
 
-[          ] - Fix ConfigParser class: Just pass a config object around, not a dict of dicts
-This should simplify the FileDescriptor class utility functions
-
-https://bip.weizmann.ac.il/course/python/PyMOTW/PyMOTW/docs/ConfigParser/index.html
-https://docs.python.org/3/library/configparser.html
-
-[          ] - Default/Required config section should have const name define in SW
-- This const name can be used to more-cleanly access values in those default sections
-- Another API should be defined for the dual-case, which is an instance of something with a known dictionary, but with section name and values specified at runtime [FILE_DESCRIPTORS]
-- Find a way to describe the files to the Makefile?
-  - This should likely be happening in the gen_makefile_cb - written by the user anyway.
-  - They would need print out a SRC list and HEADER list themselves
 [MODULE_DEF]
 test_harness_sources = tools/test_harnesses/unity/unity.c
 makefile_sources = source test_source test_harness_sources
