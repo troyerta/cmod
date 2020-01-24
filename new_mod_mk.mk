@@ -10,11 +10,9 @@ RESULTS_TXT_SUFFIX = _results
 
 include $(PROJ_ROOT)/unit_test/module_makefile
 
-
 config.ini changes:
 
-Question: Can we just tell the Makefile to find/use the regexes?
-
+Question: Can we just tell the Makefile to find/use the globs?
 
 Yes, if we use the 'foreach' function:
 

@@ -24,6 +24,13 @@ RUN_TEST_CASE( LedDriver2, AllOn );
 RUN_TEST_CASE( LedDriver2, AllOff );
 }
 
+TEST_GROUP_RUNNER( ProductionCode2 )
+{
+RUN_TEST_CASE( ProductionCode2, IgnoredTest );
+RUN_TEST_CASE( ProductionCode2, AnotherIgnoredTest );
+RUN_TEST_CASE( ProductionCode2, ThisFunctionHasNotBeenTested_NeedsToBeImplemented );
+}
+
 TEST_GROUP_RUNNER( ProductionCode )
 {
 RUN_TEST_CASE( ProductionCode, FindFunction_WhichIsBroken_ShouldReturnZeroIfItemIsNotInList_WhichWorksEvenInOurBrokenCode );
@@ -33,19 +40,12 @@ RUN_TEST_CASE( ProductionCode, FunctionWhichReturnsLocalVariable_ShouldReturnThe
 RUN_TEST_CASE( ProductionCode, FnRetsLocVar_ShouldReturnCurrentCounter_FailsBCItsTestIsFlawed );
 }
 
-TEST_GROUP_RUNNER( ProductionCode2 )
-{
-RUN_TEST_CASE( ProductionCode2, IgnoredTest );
-RUN_TEST_CASE( ProductionCode2, AnotherIgnoredTest );
-RUN_TEST_CASE( ProductionCode2, ThisFunctionHasNotBeenTested_NeedsToBeImplemented );
-}
-
 static void RunAllTests( void )
 {
 RUN_TEST_GROUP( LedDriver );
 RUN_TEST_GROUP( LedDriver2 );
-RUN_TEST_GROUP( ProductionCode );
 RUN_TEST_GROUP( ProductionCode2 );
+RUN_TEST_GROUP( ProductionCode );
 }
 
 int main( int argc, const char * argv[] )
