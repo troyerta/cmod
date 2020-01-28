@@ -1,21 +1,18 @@
 
 Tests:
+[=======   ] - Finish Task queue - print return values properly and queue data
 [          ] - Module test scripts should take an argument that enables results to be printed or redirected to some file
 [          ] - Add fff to test generator - add it commented out during test source generation?
 [          ] - Add option to "./cmod test -m=module_name"  : -s=SUITE_NAME - To build/run only the specified suite to the runner - should this be a cmod list feature?
 
+
 Config and Makefile Changes:
-[==========] - Finish callback implementations
-[=======   ] - Finish Task queue - print return values properly and queue data
-[          ] - Try to add includes to generated source files
-[          ] - Check generated files against it's config glob to warn if the file name does not match glob
-[          ] - Teach makefile to use paths and globs from certain FILE_DEF sections
-             - Make a default_settings_makefile included at the top of each module makefile, which fills in the project default settings, making any entry in between the includes a sign that the default value should be replaced. There would make each module's makefile much more minimal. These can be first filled out as a template by the user.
+[          ] - Structure command handling more like meson does
+[          ] - Check generated files against it's config glob to warn if the file name does not match glob - when user break their promise
 [          ] - Set const key values - no more string literals
 [          ] - Move global makefile and test harnesses to cmod dir
 [          ] - Rename and clean-out files in cmod-lib
 [          ] - Default/Required config sections should have const name define in SW
-[==========] - Config should just become a single dictionary that gets read once, then passed around all over the place?
              - Demand that all modules have the same structure everywhere?
              - Or Store a module's structure in a config.ini local to the module?
              - Store settings in an ini IFF the module needs to differ in structure from the default?
@@ -24,7 +21,7 @@ Config and Makefile Changes:
              makefile_sources = source test_source test_harness_sources
              test_harness_headers = tools/test_harnesses/unity/unity.h
              makefile_headers = header test_harness_headers
-[          ] - Need a function that checks Configs and filling in defaults as necessary
+[          ] - Need a function that checks Configs and fills in defaults as necessary
 [          ] - Eliminate literal magic string in accesses to module_configs dict so the list of expected config key
              - go from:
              name = mod_configs["some_name_setting"]
@@ -32,8 +29,6 @@ Config and Makefile Changes:
              name_setting_key = "some_name_setting"
              name = mod_configs[name_setting_key]
 [          ] - Handle cases for bad config, or no config given or present - make built-in default styles and conventions
-[          ] - Implement basic callbacks and styles in module.py
-[          ] - Implement several common naming conventions and coding styles in module.py
 [          ] - Add some copywrite and license strings in module.py to demonstrate how it could work
 [          ] - Handle module-specific/local configs, which can overwrite global config.ini
 [          ] - Fix python naming conventions throughout Cmod:
@@ -63,6 +58,7 @@ Setup and Install:
 [          ] - Fix the project-level scripts to check for the proper venv before running, or maybe just a init/config script
 
 Generation:
+[          ] - Try to add includes to generated source files
 [          ] - Add "This is a generated file" warning to the files that should not be hand-modified
              - /* Do not modify - this is a generated file. Please refer to *** to modify the way this file is made
 [          ] - Draft up a copy of the licensing text to be used
@@ -83,27 +79,14 @@ General:
 [          ] - Add --version argument
 [          ] - Print during test, or only after test is complete - add to config
 [          ] - Make cmod export function
-             cmod export
-             --module
-             --r
-             --test_harness
-             --make
-             --meson
+             cmod export --module --r --test_harness --make --meson
 
 [RESOURCES]
 https://github.com/lefticus/cppbestpractices/blob/master/02-Use_the_Tools_Available.md
 
 [TDD]
 Test Harnesses: Catch, minunit, Greatest, CppUTest API, CMocka, check
-Mocking Frameworks: FFF, CMock, HippoMocks
-https://github.com/dascandy/hippomocks
-[STATIC]
-Static Analyzers:
-Complexity:
-Formatters: Snippet of code #1! Snippet of code #1!
 https://sourceforge.net/projects/gcgreatcode/
-artistic style
-uncrustify
 https://www.gnu.org/software/indent/
 https://invisible-island.net/bcpp/
 
@@ -115,7 +98,7 @@ Selectable Test Harness Support:
 [          ] - Make a mocks wrapper - attach to config class
 
 Selectable Build System Support:
-- Make, Meson, Ninja, CMake, waf?
+- Make, Meson/Ninja, CMake/Ninja, waf
 
 Selectable Host Toolchain Support:
 [          ] - Make host toolchain configurable, GCC, Clang

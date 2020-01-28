@@ -41,11 +41,31 @@ CFLAGS += -Wmissing-field-initializers
 CFLAGS += -Wno-unknown-pragmas
 CFLAGS += -Wundef
 
+# Use some default settings for these variables only if they are not defined
+# already by a module's Makefile
+UNITY_DIR ?= $(PROJ_ROOT)unit_test/unity
+FFF_DIR ?= $(PROJ_ROOT)unit_test/fff
+
 # The executable's file name is generated from the runner source's name
 EXECUTABLE = $(BUILD_PATH)/$(BUILD_PREFIX)$(notdir $(MODULE_DIR)$(BUILD_SUFFIX))$(TARGET_EXTENSION)
 
 # The result's file name is generated from the runner source's name
 RESULTS = $(RESULT_PATH)/$(RESULT_PREFIX)$(notdir $(MODULE_DIR))$(RESULT_SUFFIX).txt
+
+SRC_FILES += $(wildcard $(UNITY_DIR)/*.c)
+
+# Add the test harness dirs
+HDR_DIRS += $(UNITY_DIR)
+HDR_DIRS += $(FFF_DIR)
+
+# Make the include dir string for call to the compiler
+INC_DIRS = $(addprefix -I, $(HDR_DIRS))
+
+# Add test harness headers to list of dependencies
+INC_FILES += $(wildcard $(UNITY_DIR)/*.h)
+
+# Special #defines desired for the build
+SYMBOLS=
 
 # Clean out old results and executable
 # Then make sure all necessary directories are in place
@@ -81,8 +101,8 @@ $(RESULT_PATH):
 
 # Delete old results file and executable to force compilation of sources under test
 clean:
-	@$(CLEANUP) $(EXE_DIR)/*$(TARGET_EXTENSION)
-	@$(CLEANUP) $(RESULTS_DIR)/*.txt
+	@$(CLEANUP) $(BUILD_PATH)/*$(TARGET_EXTENSION)
+	@$(CLEANUP) $(RESULT_PATH)/*.txt
 
 # Adjust the width of the first column by changing the 30 value in the printf pattern to something larger or smaller
 # Remove the | sort to have targets ordered the way they appear in the makefile instead of alphabetically
