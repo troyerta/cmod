@@ -5,6 +5,7 @@ import subprocess
 
 from Unity import TestSrc, TestResult, UnityOutput, TestSummary
 from Utils import find_files
+from FileGenerator import GeneratedFileDescriptor
 
 def do_test_cycle( module ):
     module.find_test_src_files()
@@ -55,38 +56,11 @@ class Module:
 
     # This should grab a generator class and look for file defs in the "runner" category
     def gen_test_runner( self ):
-        # CALLBACK
-        # For each test group object, make a call to it's runner in a new file
-        basename = os.path.splitext( os.path.basename( self.path ))
-        # test_runner_basename = self.config["FILE_DEF_TEST_RUNNER"]["path"]
-        test_runner_basename = self.config["FILE_DEF_TEST_RUNNER"]["prefix"] + basename[0].lower() + self.config["FILE_DEF_TEST_RUNNER"]["suffix"] +'.c'
-        self.test_runner_path = os.path.join( self.path, self.config["FILE_DEF_TEST_RUNNER"]["path"], test_runner_basename )
-        os.makedirs( os.path.join( self.path, self.config["FILE_DEF_TEST_RUNNER"]["path"]), exist_ok=True )
-        # print( 'test_runner_path =', self.test_runner_path)
-
-        with open(self.test_runner_path, "w+") as f:
-            f.write('#include \"unity_fixture.h\"\n')
-            f.write("\n")
-            # Write out a Test Suite Runner for each suite
-            # for test_src_obj in self.test_sources:
-            for group in self.test_groups:
-                f.write('TEST_GROUP_RUNNER( ' + group.name + ' )\n' )
-                f.write('{\n')
-                [f.write("RUN_TEST_CASE( " + group.name + ', ' + test_case + ' );\n') for test_case in group.testList]
-                f.write('}\n\n')
-            f.write("static void RunAllTests( void )\n")
-            f.write("{\n")
-            # for source in self.test_sources:
-            for group in self.test_groups:
-                f.write("RUN_TEST_GROUP( " + group.name + " );\n")
-            f.write("}\n")
-            f.write("\n")
-            f.write("int main( int argc, const char * argv[] )\n")
-            f.write("{\n")
-            f.write("return UnityMain( argc, argv, RunAllTests );\n")
-            f.write("}\n")
-            f.write("\n")
-            f.close()
+        module_definition = self.config["GLOBAL"]["default_module_def"]
+        hook_source = os.path.splitext( os.path.normpath( self.config[ module_definition ][ "file_gen_callbacks" ] ) )[0]
+        hooks = __import__( hook_source, globals(), locals(), [], 0 )
+        test_runner_generator = GeneratedFileDescriptor( self.name, self.config[ "CMOD_FILE_GENERATORS" ]["runner"], self.config, hooks )
+        test_runner_generator.gen_file( self.path, self.config, self.test_groups )
 
     def run_makefile( self ):
         p1 = subprocess.Popen( ['make', '--directory', self.path ], stdout=subprocess.PIPE )

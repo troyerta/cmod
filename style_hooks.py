@@ -221,10 +221,37 @@ def print_test_source( module_dir, configs ):
 def gen_test_runner_pathname( module_dir, configs ):
     basename = os.path.splitext( os.path.basename( module_dir ))
     test_runner_basename = configs["FILE_DEF_TEST_RUNNER"]["prefix"] + basename[0].lower() + configs["FILE_DEF_TEST_RUNNER"]["suffix"] +'.c'
-    return test_runner_basename
+    test_runner_pathname = os.path.join( module_dir, configs["FILE_DEF_TEST_RUNNER"]["path"], test_runner_basename )
+    return test_runner_pathname
 
-def print_test_runner( module_dir, configs ):
-    print("Printing test runner:")
+def print_test_runner( module_dir, configs, test_groups ):
+    # print("Printing test runner:")
+
+    test_runner_path = gen_test_runner_pathname( module_dir, configs )
+    os.makedirs( os.path.join( module_dir, configs["FILE_DEF_TEST_RUNNER"]["path"]), exist_ok=True )
+    with open(test_runner_path, "w+") as f:
+        f.write('#include \"unity_fixture.h\"\n')
+        f.write("\n")
+        # Write out a Test Suite Runner for each suite
+        for group in test_groups:
+            f.write('TEST_GROUP_RUNNER( ' + group.name + ' )\n' )
+            f.write('{\n')
+            [f.write("RUN_TEST_CASE( " + group.name + ', ' + test_case + ' );\n') for test_case in group.testList]
+            f.write('}\n\n')
+        f.write("static void RunAllTests( void )\n")
+        f.write("{\n")
+        # for source in self.test_sources:
+        for group in test_groups:
+            f.write("RUN_TEST_GROUP( " + group.name + " );\n")
+        f.write("}\n")
+        f.write("\n")
+        f.write("int main( int argc, const char * argv[] )\n")
+        f.write("{\n")
+        f.write("return UnityMain( argc, argv, RunAllTests );\n")
+        f.write("}\n")
+        f.write("\n")
+        f.close()
+
 
 # makefile
 
